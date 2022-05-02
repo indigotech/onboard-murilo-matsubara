@@ -1,10 +1,10 @@
-import { config } from "dotenv";
+import { config as configDotenv } from "dotenv";
 import express from "express";
 import { graphqlHTTP } from "express-graphql";
 import { buildSchema } from "graphql";
 
 // Make environment variables from `.env` available
-config();
+configDotenv();
 
 // Graphql schema
 const schema = buildSchema(`
