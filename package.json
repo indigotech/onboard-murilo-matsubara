@@ -4,7 +4,7 @@
 	"description": "Onboard backend project to get familiar with Taqtile's workflow and projects best practices.",
 	"main": "dist/index.js",
 	"scripts": {
-		"start": "node src/index.js",
+		"start": "node dist/index.js",
 		"test": "echo \"Error: no test specified\" && exit 1",
 		"dev": "concurrently \"tsc -w\" \"nodemon -L\"",
 		"watch": "tsc -w",
