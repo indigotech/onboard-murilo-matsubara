@@ -7,9 +7,15 @@ import { startApolloServer } from './server';
 import { helloTypeDef } from './types/hello.type';
 
 async function main() {
+<<<<<<< HEAD
   makeDotenvAvailable();
   configAndInitilizeServer();
   testDbUser();
+=======
+    makeDotenvAvailable();
+    configAndInitilizeServer();
+    insertTestDbUser();
+>>>>>>> Renamed test db function
 }
 
 async function configAndInitilizeServer() {
