@@ -5,17 +5,17 @@ import { startApolloServer } from './server';
 import { helloTypeDef } from './types/hello.type';
 
 async function main() {
-  makeDotenvAvailable();
-  configAndInitilizeServer();
+    makeDotenvAvailable();
+    configAndInitilizeServer();
 }
 
 async function configAndInitilizeServer() {
-  const PORT = process.env.APP_PORT ?? DEFAULT_SERVER_PORT;
-  const PATH = process.env.GRAPHQL_PATH ?? DEFAULT_GRAPHQL_PATH;
+    const PORT = process.env.APP_PORT ?? DEFAULT_SERVER_PORT;
+    const PATH = process.env.GRAPHQL_PATH ?? DEFAULT_GRAPHQL_PATH;
 
-  await startApolloServer(helloTypeDef, helloResolver, PORT, PATH);
+    await startApolloServer(helloTypeDef, helloResolver, PORT, PATH);
 
-  console.log(`Graphql server is running on: http://localhost:${PORT}${PATH}`);
+    console.log(`Graphql server is running on: http://localhost:${PORT}${PATH}`);
 }
 
 main();
