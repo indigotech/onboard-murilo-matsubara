@@ -10,8 +10,7 @@
         "watch": "tsc -w",
         "build": "tsc",
         "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
-        "prettier": "prettier --write .",
-        "ts-node": "ts-node src/index.ts"
+        "prettier": "prettier --write ."
     },
     "repository": {
         "type": "git",
