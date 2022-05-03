@@ -4,10 +4,11 @@ import { startApolloServer } from "./server";
 import { helloTypeDef } from "./types/hello.type";
 
 async function main() {
-	// Make environment variables from `.env` available
 	makeDotenvAvailable();
+	configAndInitilizeServer();
+}
 
-	// Config and initialize server
+async function configAndInitilizeServer() {
 	const PORT = process.env.APP_PORT || "4000";
 	const PATH = process.env.GRAPHQL_PATH || "/graphql";
 
