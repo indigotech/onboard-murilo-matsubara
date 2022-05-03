@@ -1,0 +1,41 @@
+{
+	"name": "onboard-murilo-matsubara",
+	"version": "1.0.0",
+	"description": "Onboard backend project to get familiar with Taqtile's workflow and projects best practices.",
+	"main": "dist/index.js",
+	"scripts": {
+		"start": "node dist/index.js",
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"dev": "concurrently \"tsc -w\" \"nodemon -L\"",
+		"watch": "tsc -w",
+		"build": "tsc"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/indigotech/onboard-murilo-matsubara.git"
+	},
+	"keywords": [
+		"onboard",
+		"backend"
+	],
+	"author": "Murilo Matsubara",
+	"license": "ISC",
+	"bugs": {
+		"url": "https://github.com/indigotech/onboard-murilo-matsubara/issues"
+	},
+	"homepage": "https://github.com/indigotech/onboard-murilo-matsubara#readme",
+	"dependencies": {
+		"dotenv": "^16.0.0",
+		"express": "^4.18.1",
+		"express-graphql": "^0.12.0",
+		"graphql": "^15.8.0"
+	},
+	"devDependencies": {
+		"@types/express": "^4.17.13",
+		"@types/express-graphql": "^0.9.0",
+		"@types/graphql": "^14.5.0",
+		"concurrently": "^7.1.0",
+		"nodemon": "^2.0.16",
+		"typescript": "^4.6.4"
+	}
+}
