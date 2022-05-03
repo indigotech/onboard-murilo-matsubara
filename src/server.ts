@@ -7,7 +7,7 @@ export async function startApolloServer(
 	typeDefs: Config<ExpressContext>["typeDefs"],
 	resolvers: Config<ExpressContext>["resolvers"],
 	port: string | number = 4000,
-	path: string = "/graphql"
+	path = "/graphql"
 ) {
 	const app = express();
 	const httpServer = http.createServer(app);
