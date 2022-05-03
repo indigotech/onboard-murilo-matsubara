@@ -1,4 +1,9 @@
+# Ignore folders
 dist
 node_modules
 .git
 package*.json
+
+# Yaml files
+*.yml
+*.yaml
