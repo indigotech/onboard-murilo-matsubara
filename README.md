@@ -8,19 +8,27 @@ Onboard backend project to get familiar with Taqtile's workflow and projects bes
 
 To run the server, you need first to have node.js installed on your machine. After that, you can follow the steps bellow:
 
-### Install dependencies
+### 1. Environment
+
+Edit `sample.env` file to your liking and then rename it to `.env`. After that you can startup the required containers executing the following command:
+
+```
+docker-compose up
+```
+
+### 2. Install dependencies
 
 ```
 npm install
 ```
 
-### Transpile typescript files to javascript
+### 3. Transpile typescript files to javascript
 
 ```
 npm run build
 ```
 
-### Run the server
+### 4. Run the server
 
 ```
 npm start
