@@ -1,7 +1,7 @@
 import { config as makeDotenvAvailable } from 'dotenv';
 import { DEFAULT_GRAPHQL_PATH, DEFAULT_SERVER_PORT } from './consts';
 import { appDataSource } from './data-source';
-import { User } from './entities/User.entity';
+import { User } from './entities/user.entity';
 import { helloResolver } from './resolvers/hello.resolver';
 import { startApolloServer } from './server';
 import { helloTypeDef } from './types/hello.type';
