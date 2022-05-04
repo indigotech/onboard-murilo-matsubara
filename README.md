@@ -10,25 +10,29 @@ To run the server, you need first to have node.js installed on your machine. Aft
 
 ### 1. Environment
 
-Edit `sample.env` file to your liking and then rename it to `.env`. After that you can startup the required containers executing the following command:
+Make a copy of `sample.env` with the name `.env`, then modify `.env` to your liking. If you plan to add a new environment variable, make sure to update the `sample.env` file.
+
+### 2. Infra
+
+To startup the required containers to run the project, execute the following command:
 
 ```
 docker-compose up
 ```
 
-### 2. Install dependencies
+### 3. Install dependencies
 
 ```
 npm install
 ```
 
-### 3. Transpile typescript files to javascript
+### 4. Transpile typescript files to javascript
 
 ```
 npm run build
 ```
 
-### 4. Run the server
+### 5. Run the server
 
 ```
 npm start
