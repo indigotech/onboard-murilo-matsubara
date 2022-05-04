@@ -6,8 +6,10 @@ services:
       - "5432:5432"
     volumes:
       - ./db/dumps:/app-db-dumps
-    env_file:
-      - ./.env
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=localenv
+      - POSTGRES_DATABASE=postgres
 
   testdb:
     image: postgres:14-alpine
@@ -15,5 +17,7 @@ services:
       - "5433:5432"
     volumes:
       - ./db/dumps:/app-db-dumps
-    env_file:
-      - ./.env
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=localenv
+      - POSTGRES_DATABASE=postgres

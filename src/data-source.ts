@@ -1,23 +1,29 @@
+import { config as makeDotenvAvailable } from 'dotenv';
 import 'reflect-metadata';
 import { DataSource } from 'typeorm';
-import {
-    DEFAULT_POSTGRES_DB,
-    DEFAULT_POSTGRES_HOST,
-    DEFAULT_POSTGRES_PASSWORD,
-    DEFAULT_POSTGRES_PORT,
-    DEFAULT_POSTGRES_USER,
-} from './consts';
-import { isDevEnvironment, makeDotenvAvailable } from './utils/env';
+import { isDevEnvironment } from './utils/env';
 
 makeDotenvAvailable();
 
+if (
+    !process.env.DB_HOST ||
+    !process.env.DB_PORT ||
+    !process.env.DB_USER ||
+    !process.env.DB_PASSWORD ||
+    !process.env.DB_DATABASE
+) {
+    throw ReferenceError(
+        'Could not find one of the required variables inside of `.env`. Check `README.md` for more instructions.',
+    );
+}
+
 export const appDataSource = new DataSource({
     type: 'postgres',
-    host: process.env.POSTGRES_HOST ?? DEFAULT_POSTGRES_HOST,
-    port: parseInt(process.env.POSTGRES_PORT ?? DEFAULT_POSTGRES_PORT),
-    username: process.env.POSTGRES_USER ?? DEFAULT_POSTGRES_USER,
-    password: process.env.POSTGRES_PASSWORD ?? DEFAULT_POSTGRES_PASSWORD,
-    database: process.env.POSTGRES_DB ?? DEFAULT_POSTGRES_DB,
+    host: process.env.DB_HOST,
+    port: parseInt(process.env.DB_PORT),
+    username: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_DATABASE,
     synchronize: isDevEnvironment(),
     entities: ['dist/**/*.entity.js'],
     migrations: [],
