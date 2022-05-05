@@ -1,10 +1,10 @@
+import { appDataSource } from '../data-source';
 import { User } from '../entities/user.entity';
-import { GraphqlContext } from '../server';
 
 export const userResolver = {
   Mutation: {
-    createUser: async function (_: never, { user }: { user: User }, { dataSource }: GraphqlContext) {
-      const newUser = await dataSource.manager.save(User, user);
+    createUser: async function (_: never, { user }: { user: User }) {
+      const newUser = await appDataSource.manager.save(User, user);
 
       return {
         id: newUser.id,

@@ -11,7 +11,6 @@ export interface GraphqlContext {
 export async function startApolloServer(
   typeDefs: Config<ExpressContext>['typeDefs'],
   resolvers: Config<ExpressContext>['resolvers'],
-  context: GraphqlContext,
   port: string | number = 4000,
   path = '/graphql',
 ) {
@@ -21,7 +20,6 @@ export async function startApolloServer(
   const server = new ApolloServer({
     typeDefs,
     resolvers,
-    context: () => context,
     plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
   });
 
