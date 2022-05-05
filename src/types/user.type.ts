@@ -8,7 +8,7 @@ export const userTypeDef = gql`
     birthDate: String
   }
 
-  type UserOutput {
+  type User {
     id: Int
     name: String
     email: String
@@ -16,6 +16,6 @@ export const userTypeDef = gql`
   }
 
   type Mutation {
-    createUser(user: UserInput): UserOutput
+    createUser(user: UserInput): User
   }
 `;
