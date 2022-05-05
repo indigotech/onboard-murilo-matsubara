@@ -12,7 +12,7 @@ if (
   !process.env.DB_PASSWORD ||
   !process.env.DB_DATABASE
 ) {
-  throw ReferenceError(
+  throw new ReferenceError(
     'Could not find one of the required variables inside of `.env`. Check `README.md` for more instructions.',
   );
 }
