@@ -4,9 +4,10 @@
     "description": "Onboard backend project to get familiar with Taqtile's workflow and projects best practices.",
     "main": "dist/index.js",
     "scripts": {
-        "start": "node dist/index.js",
+        "start": "NODE_ENV=production node dist/index.js",
         "test": "echo \"Error: no test specified\" && exit 1",
         "dev": "concurrently \"tsc -w\" \"nodemon -L\"",
+        "infra": "docker-compose up -d",
         "watch": "tsc -w",
         "build": "tsc",
         "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
@@ -31,11 +32,15 @@
         "apollo-server-express": "3.6.7",
         "dotenv": "16.0.0",
         "express": "4.18.1",
-        "graphql": "15.8.0"
+        "graphql": "15.8.0",
+        "pg": "8.7.3",
+        "reflect-metadata": "0.1.13",
+        "typeorm": "0.3.6"
     },
     "devDependencies": {
         "@types/express": "4.17.13",
         "@types/graphql": "14.5.0",
+        "@types/node": "16.11.3",
         "@typescript-eslint/eslint-plugin": "5.22.0",
         "@typescript-eslint/parser": "5.22.0",
         "concurrently": "7.1.0",
