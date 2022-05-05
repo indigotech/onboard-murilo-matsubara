@@ -1,10 +1,17 @@
+import { User } from '../entities/user.entity';
+import { GraphqlContext } from '../server';
+
 export const userResolver = {
   Mutation: {
-    createUser: async (_: never, { user }: { user: { name: string; email: string; birthDate: string } }) => ({
-      id: 1,
-      name: user.name,
-      email: user.email,
-      birthDate: user.birthDate,
-    }),
+    createUser: async function (_: never, { user }: { user: User }, { dataSource }: GraphqlContext) {
+      const newUser = await dataSource.manager.save(User, user);
+
+      return {
+        id: newUser.id,
+        name: newUser.name,
+        email: newUser.email,
+        birthDate: newUser.birthDate,
+      };
+    },
   },
 };
