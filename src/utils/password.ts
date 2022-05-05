@@ -1,3 +1,6 @@
+import bcrypt from 'bcrypt';
+import { DEFAULT_PASSWORD_HASH_ROUNDS } from '../consts';
+
 type PasswordRules = 'must contain 1 digit' | 'must contain 1 letter' | 'must have at least six characters';
 type PasswordRuleChecker = (password: string) => boolean;
 
@@ -19,3 +22,14 @@ export const getBrokenPasswordRules = (password: string) =>
   Object.entries(passwordRules)
     .filter(([_, isRuleOk]) => !isRuleOk(password))
     .map(([ruleName]) => ruleName);
+
+if (!process.env.PASSWORD_HASH_SALT) {
+  throw new ReferenceError('Environment variable `PASSWORD_HASH_SALT` was not found.');
+}
+
+const saltPassword = (password: string) => `${process.env.PASSWORD_HASH_SALT}_${password}`;
+
+export const hashPassword = (password: string) => bcrypt.hash(saltPassword(password), DEFAULT_PASSWORD_HASH_ROUNDS);
+
+export const checkPassword = (unhashedPassword: string, hashedPassword: string) =>
+  bcrypt.compare(saltPassword(unhashedPassword), hashedPassword);
