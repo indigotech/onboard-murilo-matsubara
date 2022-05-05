@@ -17,7 +17,7 @@ Make a copy of `sample.env` with the name `.env`, then modify `.env` to your lik
 To startup the required containers to run the project, execute the following command:
 
 ```
-docker-compose up
+npm run infra
 ```
 
 ### 3. Install dependencies
