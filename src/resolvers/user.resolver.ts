@@ -1,10 +1,17 @@
+import { appDataSource } from '../data-source';
+import { User } from '../entities/user.entity';
+
 export const userResolver = {
   Mutation: {
-    createUser: async (_: never, { user }: { user: { name: string; email: string; birthDate: string } }) => ({
-      id: 1,
-      name: user.name,
-      email: user.email,
-      birthDate: user.birthDate,
-    }),
+    createUser: async function (_: never, { user }: { user: User }) {
+      const newUser = await appDataSource.manager.save(User, user);
+
+      return {
+        id: newUser.id,
+        name: newUser.name,
+        email: newUser.email,
+        birthDate: newUser.birthDate,
+      };
+    },
   },
 };
