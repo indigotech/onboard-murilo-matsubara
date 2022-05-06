@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt';
-import { DEFAULT_PASSWORD_HASH_ROUNDS } from '../consts';
+import { EnvironmentVariableNotFound } from '../exceptions/env-var-not-found';
 
 type PasswordRules = 'must contain 1 digit' | 'must contain 1 letter' | 'must have at least six characters';
 type PasswordRuleChecker = (password: string) => boolean;
@@ -23,13 +23,21 @@ export const getBrokenPasswordRules = (password: string) =>
     .filter(([_, isRuleOk]) => !isRuleOk(password))
     .map(([ruleName]) => ruleName);
 
-if (!process.env.PASSWORD_HASH_SALT) {
-  throw new ReferenceError('Environment variable `PASSWORD_HASH_SALT` was not found.');
+export function hashPassword(password: string) {
+  if (!process.env.PASSWORD_HASH_ROUNDS) {
+    throw new EnvironmentVariableNotFound('PASSWORD_HASH_ROUNDS');
+  }
+  return bcrypt.hash(saltPassword(password), process.env.PASSWORD_HASH_ROUNDS);
 }
 
-const saltPassword = (password: string) => `${process.env.PASSWORD_HASH_SALT}_${password}`;
+export function checkPassword(unhashedPassword: string, hashedPassword: string) {
+  return bcrypt.compare(saltPassword(unhashedPassword), hashedPassword);
+}
 
-export const hashPassword = (password: string) => bcrypt.hash(saltPassword(password), DEFAULT_PASSWORD_HASH_ROUNDS);
+function saltPassword(password: string) {
+  if (!process.env.PASSWORD_HASH_SALT) {
+    throw new EnvironmentVariableNotFound('PASSWORD_HASH_SALT');
+  }
 
-export const checkPassword = (unhashedPassword: string, hashedPassword: string) =>
-  bcrypt.compare(saltPassword(unhashedPassword), hashedPassword);
+  return `${process.env.PASSWORD_HASH_SALT}_${password}`;
+}
