@@ -14,8 +14,8 @@ before(async () => {
   server = await setupServer();
 });
 
-describe('Graphql queries', () => {
-  it('Test hello query', async () => {
+describe('Hello query', () => {
+  it('must return hello message', async () => {
     const expectedResponseData = { data: { hello: 'Hello world!' } };
 
     const response = await axios.post(
