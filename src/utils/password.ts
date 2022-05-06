@@ -27,7 +27,7 @@ export function hashPassword(password: string) {
   if (!process.env.PASSWORD_HASH_ROUNDS) {
     throw new EnvironmentVariableNotFound('PASSWORD_HASH_ROUNDS');
   }
-  return bcrypt.hash(saltPassword(password), process.env.PASSWORD_HASH_ROUNDS);
+  return bcrypt.hash(saltPassword(password), parseInt(process.env.PASSWORD_HASH_ROUNDS));
 }
 
 export function checkPassword(unhashedPassword: string, hashedPassword: string) {
