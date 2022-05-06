@@ -1,9 +1,6 @@
-import { config as makeDotenvAvailable } from 'dotenv';
 import 'reflect-metadata';
 import { DataSource } from 'typeorm';
 import { isDevEnvironment } from './utils/env';
-
-makeDotenvAvailable();
 
 if (
   !process.env.DB_HOST ||

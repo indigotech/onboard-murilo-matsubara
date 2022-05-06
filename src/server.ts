@@ -1,6 +1,5 @@
 import { ApolloServerPluginDrainHttpServer, Config } from 'apollo-server-core';
 import { ApolloServer, ExpressContext } from 'apollo-server-express';
-import { config as makeDotenvAvailable } from 'dotenv';
 import express from 'express';
 import http from 'http';
 import { DataSource } from 'typeorm';
@@ -16,7 +15,6 @@ export interface GraphqlContext {
 }
 
 export async function setupServer() {
-  makeDotenvAvailable();
   const server = await configAndInitilizeServer();
   return server;
 }

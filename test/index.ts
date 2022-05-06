@@ -1,17 +1,18 @@
 import assert from 'assert';
 import axios from 'axios';
+import { config as makeDotenvAvailable } from 'dotenv';
 import { Server } from 'http';
+import path from 'path';
 import { setupServer } from '../src/server';
 
 let server: Server;
-const TEST_SERVER_PORT = '7890';
-const TEST_SERVER_HOST = 'localhost';
-const TEST_SERVER_GRAPHQL_PATH = '/graphql';
-const TEST_SERVER_URL = `http://${TEST_SERVER_HOST}:${TEST_SERVER_PORT}${TEST_SERVER_GRAPHQL_PATH}`;
+let TEST_SERVER_URL: string;
 
 before(async () => {
-  process.env.APP_PORT = TEST_SERVER_PORT;
-  process.env.GRAPHQL_PATH = TEST_SERVER_GRAPHQL_PATH;
+  makeDotenvAvailable({ path: path.resolve(process.cwd(), 'test.env') });
+  console.log(process.env.APP_PORT);
+  TEST_SERVER_URL = `http://localhost:${process.env.APP_PORT}${process.env.GRAPHQL_PATH}`;
+  console.log(TEST_SERVER_URL);
   server = await setupServer();
 });
 
