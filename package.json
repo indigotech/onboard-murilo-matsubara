@@ -5,7 +5,7 @@
     "main": "dist/index.js",
     "scripts": {
         "start": "NODE_ENV=production node dist/index.js",
-        "test": "echo \"Error: no test specified\" && exit 1",
+        "test": "mocha",
         "dev": "concurrently \"tsc -w\" \"nodemon\"",
         "infra": "docker-compose up -d",
         "watch": "tsc -w",
