@@ -4,7 +4,7 @@ import express from 'express';
 import http from 'http';
 import { DataSource } from 'typeorm';
 import { DEFAULT_GRAPHQL_PATH, DEFAULT_SERVER_PORT } from './consts';
-import { appDataSource } from './data-source';
+import { getDataSource } from './data-source';
 import { helloResolver } from './resolvers/hello.resolver';
 import { userResolver } from './resolvers/user.resolver';
 import { helloTypeDef } from './types/hello.type';
@@ -21,7 +21,7 @@ export async function setupServer() {
 
 async function configAndInitilizeServer() {
   const context: GraphqlContext = {
-    dataSource: await appDataSource.initialize(),
+    dataSource: await getDataSource().initialize(),
   };
 
   const PORT = process.env.APP_PORT ?? DEFAULT_SERVER_PORT;
@@ -42,6 +42,7 @@ async function configAndInitilizeServer() {
 export async function startApolloServer(
   typeDefs: Config<ExpressContext>['typeDefs'],
   resolvers: Config<ExpressContext>['resolvers'],
+  context: GraphqlContext,
   port: string | number = 4000,
   path = '/graphql',
 ) {
@@ -51,6 +52,7 @@ export async function startApolloServer(
   const server = new ApolloServer({
     typeDefs,
     resolvers,
+    context,
     plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
   });
 
