@@ -3,7 +3,7 @@ import { QueryFailedError } from 'typeorm';
 import { UNIQUE_CONSTRAINT_ERROR_CODE } from '../consts';
 import { User } from '../entities/user.entity';
 import { GraphqlContext } from '../server';
-import { hashPassword, isPasswordValid } from '../utils/password';
+import { hashPassword, isPasswordValid, rulesErrorMessage } from '../utils/password';
 
 export const userResolver = {
   Mutation: {
@@ -30,7 +30,7 @@ export const userResolver = {
 function validatePassword(user: User) {
   const { valid, brokenRules } = isPasswordValid(user.password);
   if (!valid) {
-    throw new ValidationError(`Password: ${brokenRules}`);
+    throw new ValidationError(`Password: ${brokenRules.map((rule) => rulesErrorMessage[rule])}`);
   }
 }
 

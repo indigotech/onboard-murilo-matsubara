@@ -1,17 +1,23 @@
 import bcrypt from 'bcrypt';
 import { EnvironmentVariableNotFound } from '../exceptions/env-var-not-found';
 
-type PasswordRules = 'must contain 1 digit' | 'must contain 1 letter' | 'must have at least six characters';
+type PasswordRule = 'contain_digit' | 'contain_letter' | 'min_size_6';
 type PasswordRuleChecker = (password: string) => boolean;
 
-const passwordRules: Record<PasswordRules, PasswordRuleChecker> = {
-  'must contain 1 digit': (password) => /\d+/.test(password),
-  'must contain 1 letter': (password) => /[a-zA-Z]+/.test(password),
-  'must have at least six characters': (password) => /.{6,}/.test(password),
+const passwordRules: Record<PasswordRule, PasswordRuleChecker> = {
+  contain_digit: (password) => /\d+/.test(password),
+  contain_letter: (password) => /[a-zA-Z]+/.test(password),
+  min_size_6: (password) => /.{6,}/.test(password),
+};
+
+export const rulesErrorMessage: Record<PasswordRule, string> = {
+  contain_digit: 'must contain 1 digit',
+  contain_letter: 'must contain 1 letter',
+  min_size_6: 'must have at least 6 characters',
 };
 
 export const isPasswordValid = (password: string) => {
-  const brokenRules: string[] = getBrokenPasswordRules(password);
+  const brokenRules = getBrokenPasswordRules(password);
   return {
     valid: brokenRules.length == 0,
     brokenRules,
@@ -21,7 +27,7 @@ export const isPasswordValid = (password: string) => {
 export const getBrokenPasswordRules = (password: string) =>
   Object.entries(passwordRules)
     .filter(([_, isRuleOk]) => !isRuleOk(password))
-    .map(([ruleName]) => ruleName);
+    .map(([ruleName]) => ruleName) as PasswordRule[];
 
 export function hashPassword(password: string) {
   if (!process.env.PASSWORD_HASH_ROUNDS) {
