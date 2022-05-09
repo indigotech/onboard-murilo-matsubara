@@ -28,7 +28,7 @@ export const userResolver = {
     },
 
     login: async function (_: never, { credentials }: { credentials: { email: string; password: string } }) {
-      const matchingUser = await getDataSource().manager.findOne(User, { where: { password: credentials.password } });
+      const matchingUser = await getDataSource().manager.findOne(User, { where: { email: credentials.email } });
 
       if (!matchingUser) {
         throw new InvalidLoginCredentials();
