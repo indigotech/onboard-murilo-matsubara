@@ -69,3 +69,4 @@ Bellow is the list of some of the tools used:
 | [express.js](https://expressjs.com/)                                                                                                                                  | Http server for apollo                                       |
 | [typeorm](https://typeorm.io/)                                                                                                                                        | ORM which mostly eases the process of dealing with databases |
 | [concurrently](https://www.npmjs.com/package/concurrently) + [typescript](https://www.npmjs.com/package/typescript) +[nodemon](https://www.npmjs.com/package/nodemon) | Packages to make hotreload easier when used in combination   |
+| [bcrypt](https://www.npmjs.com/package/bcrypt)                                                                                                                        | Bcrypt encryption algorithm implementation                   |

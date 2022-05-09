@@ -3,12 +3,13 @@ import { QueryFailedError } from 'typeorm';
 import { UNIQUE_CONSTRAINT_ERROR_CODE } from '../consts';
 import { appDataSource } from '../data-source';
 import { User } from '../entities/user.entity';
-import { isPasswordValid } from '../utils/password';
+import { hashPassword, isPasswordValid } from '../utils/password';
 
 export const userResolver = {
   Mutation: {
     createUser: async function (_: never, { user }: { user: User }) {
       validatePassword(user);
+      user.password = await hashPassword(user.password);
 
       try {
         const newUser = await appDataSource.manager.save(User, user);
