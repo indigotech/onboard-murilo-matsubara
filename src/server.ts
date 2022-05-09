@@ -3,12 +3,12 @@ import { ApolloServer, ExpressContext } from 'apollo-server-express';
 import express from 'express';
 import http from 'http';
 import { DataSource } from 'typeorm';
-import { DEFAULT_GRAPHQL_PATH, DEFAULT_SERVER_PORT } from './consts';
 import { getDataSource } from './data-source';
 import { helloResolver } from './resolvers/hello.resolver';
 import { userResolver } from './resolvers/user.resolver';
 import { helloTypeDef } from './types/hello.type';
 import { userTypeDef } from './types/user.type';
+import { Env } from './utils/env';
 
 export interface GraphqlContext {
   dataSource: DataSource;
@@ -24,8 +24,8 @@ async function configAndInitilizeServer() {
     dataSource: await getDataSource().initialize(),
   };
 
-  const PORT = process.env.APP_PORT ?? DEFAULT_SERVER_PORT;
-  const PATH = process.env.GRAPHQL_PATH ?? DEFAULT_GRAPHQL_PATH;
+  const PORT = Env.APP_PORT;
+  const PATH = Env.GRAPHQL_PATH;
 
   const server = await startApolloServer(
     [userTypeDef, helloTypeDef],

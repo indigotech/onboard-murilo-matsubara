@@ -7,8 +7,8 @@ services:
     volumes:
       - ./db/dumps:/app-db-dumps
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=localenv
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
       - POSTGRES_DATABASE=postgres
 
   testdb:
@@ -18,6 +18,6 @@ services:
     volumes:
       - ./db/dumps:/app-db-dumps
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=localenv
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
       - POSTGRES_DATABASE=postgres

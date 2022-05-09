@@ -4,13 +4,14 @@ import { config as makeDotenvAvailable } from 'dotenv';
 import { Server } from 'http';
 import path from 'path';
 import { setupServer } from '../src/server';
+import { Env } from '../src/utils/env';
 
 let server: Server;
 let TEST_SERVER_URL: string;
 
 before(async () => {
   makeDotenvAvailable({ path: path.resolve(process.cwd(), 'test.env') });
-  TEST_SERVER_URL = `http://localhost:${process.env.APP_PORT}${process.env.GRAPHQL_PATH}`;
+  TEST_SERVER_URL = `http://localhost:${Env.APP_PORT}${Env.GRAPHQL_PATH}`;
   server = await setupServer();
 });
 
