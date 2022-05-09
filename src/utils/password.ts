@@ -19,7 +19,7 @@ export const rulesErrorMessage: Record<PasswordRule, string> = {
 export const isPasswordValid = (password: string) => {
   const brokenRules = getBrokenPasswordRules(password);
   return {
-    valid: brokenRules.length == 0,
+    valid: brokenRules.length === 0,
     brokenRules,
   };
 };
