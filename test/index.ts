@@ -21,7 +21,59 @@ describe('Hello query', () => {
 
     const response = await axios.post(
       TEST_SERVER_URL,
-      { query: `query hello {\n  hello\n}`, variables: {} },
+      {
+        query: `
+        query hello {
+          hello
+        }`,
+        variables: {},
+      },
+      {
+        headers: {
+          'content-type': 'application/json',
+        },
+      },
+    );
+
+    expect(response.data).to.be.deep.equal(expectedResponseData);
+  });
+});
+
+describe('CreateUser mutation', () => {
+  it('must create user sucessfully', async () => {
+    const userToCreate = {
+      name: 'Test',
+      email: 'test@test.com',
+      birthDate: '01/01/2000',
+    };
+    const expectedResponseData = {
+      data: {
+        createUser: {
+          id: 1,
+          ...userToCreate,
+        },
+      },
+    };
+
+    const response = await axios.post(
+      TEST_SERVER_URL,
+      {
+        query: `
+        mutation CreateUser($user: UserInput) {
+          createUser(user: $user) {
+            id
+            name
+            email
+            birthDate
+          }
+        }`,
+        variables: {
+          user: {
+            ...userToCreate,
+            password: 'test12',
+          },
+        },
+      },
       {
         headers: {
           'content-type': 'application/json',
