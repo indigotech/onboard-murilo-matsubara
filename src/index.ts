@@ -1,5 +1,6 @@
 import { config as makeDotenvAvailable } from 'dotenv';
 import { DEFAULT_GRAPHQL_PATH, DEFAULT_SERVER_PORT } from './consts';
+import { appDataSource } from './data-source';
 import { helloResolver } from './resolvers/hello.resolver';
 import { userResolver } from './resolvers/user.resolver';
 import { startApolloServer } from './server';
@@ -8,6 +9,7 @@ import { userTypeDef } from './types/user.type';
 
 async function main() {
   makeDotenvAvailable();
+  appDataSource.initialize();
   configAndInitilizeServer();
 }
 
