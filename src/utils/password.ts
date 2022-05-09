@@ -1,20 +1,20 @@
 import crypto from 'crypto';
-import { SALT_SEPARATOR } from '../consts';
+import { PASSWORD_MIN_LENGTH, SALT_SEPARATOR } from '../consts';
 import { Env } from './env';
 
-type PasswordRule = 'contain_digit' | 'contain_letter' | 'min_size_6';
+type PasswordRule = 'contain_digit' | 'contain_letter' | 'min_length';
 type PasswordRuleChecker = (password: string) => boolean;
 
 const passwordRules: Record<PasswordRule, PasswordRuleChecker> = {
   contain_digit: (password) => /\d+/.test(password),
   contain_letter: (password) => /[a-zA-Z]+/.test(password),
-  min_size_6: (password) => /.{6,}/.test(password),
+  min_length: (password) => RegExp(`.{${PASSWORD_MIN_LENGTH},}`).test(password),
 };
 
 export const rulesErrorMessage: Record<PasswordRule, string> = {
   contain_digit: 'must contain 1 digit',
   contain_letter: 'must contain 1 letter',
-  min_size_6: 'must have at least 6 characters',
+  min_length: `must have at least ${PASSWORD_MIN_LENGTH} characters`,
 };
 
 export const isPasswordValid = (password: string) => {
