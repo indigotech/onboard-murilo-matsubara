@@ -1,5 +1,6 @@
 import 'reflect-metadata';
 import { DataSource } from 'typeorm';
+import { User } from './entities/user.entity';
 import { Env, isDevEnvironment } from './utils/env';
 
 let dataSource: DataSource;
@@ -9,7 +10,7 @@ export function getDataSource() {
       type: 'postgres',
       url: Env.DB_CONNECTION_STRING,
       synchronize: isDevEnvironment(),
-      entities: ['dist/**/*.entity.js'],
+      entities: [User],
       migrations: [],
       subscribers: [],
     });
