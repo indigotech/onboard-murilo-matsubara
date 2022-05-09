@@ -1,5 +1,6 @@
-import bcrypt from 'bcrypt';
-import { EnvironmentVariableNotFound } from '../exceptions/env-var-not-found';
+import crypto from 'crypto';
+import { SALT_SEPARATOR } from '../consts';
+import { Env } from './env';
 
 type PasswordRule = 'contain_digit' | 'contain_letter' | 'min_size_6';
 type PasswordRuleChecker = (password: string) => boolean;
@@ -30,20 +31,34 @@ export const getBrokenPasswordRules = (password: string) =>
     .map(([ruleName]) => ruleName) as PasswordRule[];
 
 export function hashPassword(password: string) {
-  if (!process.env.PASSWORD_HASH_ROUNDS) {
-    throw new EnvironmentVariableNotFound('PASSWORD_HASH_ROUNDS');
-  }
-  return bcrypt.hash(saltPassword(password), parseInt(process.env.PASSWORD_HASH_ROUNDS));
+  return new Promise<string>((resolve, reject) => {
+    const salt = crypto.randomBytes(16).toString('hex');
+
+    crypto.scrypt(password, salt, Env.PASSWORD_KEY_LENGTH, (error, hashedPassword) => {
+      if (error) {
+        reject(error);
+      }
+      resolve(saltPassword(salt, hashedPassword.toString('hex')));
+    });
+  });
 }
 
-export function checkPassword(unhashedPassword: string, hashedPassword: string) {
-  return bcrypt.compare(saltPassword(unhashedPassword), hashedPassword);
+export function checkPassword(unhashedPassword: string, saltedHashedPassword: string) {
+  return new Promise<boolean>((resolve, reject) => {
+    const [salt, hashedPassword] = parseSaltedPassword(saltedHashedPassword);
+    crypto.scrypt(unhashedPassword, salt, Env.PASSWORD_KEY_LENGTH, (error, hashedPasswordToCheck) => {
+      if (error) {
+        reject(error);
+      }
+      resolve(hashedPassword === hashedPasswordToCheck.toString('hex'));
+    });
+  });
 }
 
-function saltPassword(password: string) {
-  if (!process.env.PASSWORD_HASH_SALT) {
-    throw new EnvironmentVariableNotFound('PASSWORD_HASH_SALT');
-  }
+function saltPassword(salt: string, password: string) {
+  return `${salt}${SALT_SEPARATOR}${password}`;
+}
 
-  return `${process.env.PASSWORD_HASH_SALT}_${password}`;
+function parseSaltedPassword(saltedPassword: string) {
+  return saltedPassword.split(SALT_SEPARATOR);
 }
