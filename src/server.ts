@@ -9,6 +9,7 @@ import { userResolver } from './resolvers/user.resolver';
 import { helloTypeDef } from './types/hello.type';
 import { userTypeDef } from './types/user.type';
 import { Env } from './utils/env';
+import { formatError } from './utils/format-error';
 
 export interface GraphqlContext {
   dataSource: DataSource;
@@ -43,6 +44,7 @@ export async function startApolloServer(
   const server = new ApolloServer({
     typeDefs,
     resolvers,
+    formatError,
     plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
   });
 
