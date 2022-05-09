@@ -20,20 +20,12 @@ export async function setupServer() {
 }
 
 async function configAndInitilizeServer() {
-  const context: GraphqlContext = {
-    dataSource: await getDataSource().initialize(),
-  };
-
   const PORT = Env.APP_PORT;
   const PATH = Env.GRAPHQL_PATH;
 
-  const server = await startApolloServer(
-    [userTypeDef, helloTypeDef],
-    [userResolver, helloResolver],
-    context,
-    PORT,
-    PATH,
-  );
+  await getDataSource().initialize();
+
+  const server = await startApolloServer([userTypeDef, helloTypeDef], [userResolver, helloResolver], PORT, PATH);
 
   console.log(`Graphql server is running on: http://localhost:${PORT}${PATH}`);
   return server;
@@ -42,7 +34,6 @@ async function configAndInitilizeServer() {
 export async function startApolloServer(
   typeDefs: Config<ExpressContext>['typeDefs'],
   resolvers: Config<ExpressContext>['resolvers'],
-  context: GraphqlContext,
   port: string | number = 4000,
   path = '/graphql',
 ) {
@@ -52,7 +43,6 @@ export async function startApolloServer(
   const server = new ApolloServer({
     typeDefs,
     resolvers,
-    context,
     plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
   });
 
