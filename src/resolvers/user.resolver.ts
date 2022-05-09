@@ -2,6 +2,7 @@ import { ValidationError } from 'apollo-server-core';
 import { QueryFailedError } from 'typeorm';
 import { UNIQUE_CONSTRAINT_ERROR_CODE } from '../consts';
 import { User } from '../entities/user.entity';
+import { InvalidPassword } from '../exceptions/invalid-password';
 import { GraphqlContext } from '../server';
 import { hashPassword, isPasswordValid, rulesErrorMessage } from '../utils/password';
 
@@ -30,7 +31,7 @@ export const userResolver = {
 function validatePassword(user: User) {
   const { valid, brokenRules } = isPasswordValid(user.password);
   if (!valid) {
-    throw new ValidationError(`Password: ${brokenRules.map((rule) => rulesErrorMessage[rule])}`);
+    throw new InvalidPassword(`Password: ${brokenRules.map((rule) => rulesErrorMessage[rule])}`);
   }
 }
 
