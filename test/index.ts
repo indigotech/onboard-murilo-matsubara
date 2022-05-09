@@ -1,5 +1,5 @@
-import assert from 'assert';
 import axios from 'axios';
+import { expect } from 'chai';
 import { config as makeDotenvAvailable } from 'dotenv';
 import { Server } from 'http';
 import path from 'path';
@@ -29,7 +29,7 @@ describe('Hello query', () => {
       },
     );
 
-    assert.deepEqual(response.data, expectedResponseData);
+    expect(response.data).to.be.deep.equal(expectedResponseData);
   });
 });
 
