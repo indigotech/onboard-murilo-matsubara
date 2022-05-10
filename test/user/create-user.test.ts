@@ -22,7 +22,6 @@ export const createUserTests = (testServerUrl: string) => {
       const dbCreatedUser = await dataSource.manager.findOne(User, { where: { id: mutationResponse.data.id } });
       const matchPassword = await checkPassword(newUser.password, dbCreatedUser.password);
 
-      expect(dbCreatedUser).to.not.be.undefined;
       expect(mutationResponse.data).to.be.deep.equal({
         data: {
           createUser: {
@@ -33,14 +32,9 @@ export const createUserTests = (testServerUrl: string) => {
           },
         },
       });
-      expect({
-        name: dbCreatedUser.name,
-        email: dbCreatedUser.email,
-      }).to.be.deep.equal({
-        name: newUser.name,
-        email: newUser.email,
-      });
-      expect(new Date(dbCreatedUser.birthDate).toDateString()).to.be.equals(new Date(newUser.birthDate).toDateString());
+      expect(dbCreatedUser.name).to.be.equal(newUser.name);
+      expect(dbCreatedUser.email).to.be.equal(newUser.email);
+      expect(dbCreatedUser.birthDate).to.be.equals(newUser.birthDate);
       expect(matchPassword).to.be.equal(true);
     });
 
