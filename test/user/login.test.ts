@@ -25,10 +25,15 @@ export const loginTests = (testServerUrl: string) => {
       const { id } = await dataSource.manager.save(User, user);
 
       const mutationResponse = await makeLoginMutationRequest({ email: user.email, password: unhashedPassword });
-      const tokenPayload = jwt.verify(mutationResponse.data.data.login.token, Env.JWT_SECRET);
+      const tokenPayload = jwt.verify(mutationResponse.data.data.login.token, Env.JWT_SECRET) as jwt.JwtPayload;
+      const tokenDuration = tokenPayload.exp - tokenPayload.iat;
 
       expect(mutationResponse.data.errors).to.be.undefined;
-      expect(tokenPayload).to.not.be.empty;
+      expect(tokenPayload.id).to.be.equal(id);
+      expect(tokenPayload.name).to.be.equal(user.name);
+      expect(tokenPayload.email).to.be.equal(user.email);
+      expect(tokenPayload.birthDate).to.be.equal(user.birthDate);
+      expect(tokenDuration).to.be.equal(Env.JWT_EXPIRATION_TIME);
       expect(mutationResponse.data.data.login.user).to.be.deep.equal({
         name: user.name,
         email: user.email,
@@ -53,6 +58,10 @@ export const loginTests = (testServerUrl: string) => {
       const tokenDuration = tokenPayload.exp - tokenPayload.iat;
 
       expect(mutationResponse.data.errors).to.be.undefined;
+      expect(tokenPayload.id).to.be.equal(id);
+      expect(tokenPayload.name).to.be.equal(user.name);
+      expect(tokenPayload.email).to.be.equal(user.email);
+      expect(tokenPayload.birthDate).to.be.equal(user.birthDate);
       expect(tokenDuration).to.be.equal(Env.JWT_REMEMBER_ME_EXPIRATION_TIME);
       expect(mutationResponse.data.data.login.user).to.be.deep.equal({
         name: user.name,
