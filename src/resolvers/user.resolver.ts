@@ -69,7 +69,7 @@ function validatePassword(user: User) {
   }
 }
 
-function handleUserCreationError(error: Error) {
+function handleUserCreationError(error: Error): never {
   if (error instanceof QueryFailedError && error.driverError.code == UNIQUE_CONSTRAINT_ERROR_CODE) {
     throw new CustomValidationError('Email is already in use', error.message, 'DuplicatedEmail');
   }
