@@ -22,6 +22,7 @@ export const userTypeDef = gql`
   input Credentials {
     email: String
     password: String
+    rememberMe: Boolean = false
   }
 
   type LoginResponse {
@@ -30,6 +31,6 @@ export const userTypeDef = gql`
   }
 
   type Mutation {
-    login(credentials: Credentials, rememberMe: Boolean): LoginResponse
+    login(credentials: Credentials): LoginResponse
   }
 `;

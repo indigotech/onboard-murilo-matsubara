@@ -53,7 +53,11 @@ export const loginTests = (testServerUrl: string) => {
       user.password = await hashPassword(unhashedPassword);
       const { id } = await dataSource.manager.save(User, user);
 
-      const mutationResponse = await makeLoginMutationRequest({ email: user.email, password: unhashedPassword }, true);
+      const mutationResponse = await makeLoginMutationRequest({
+        email: user.email,
+        password: unhashedPassword,
+        rememberMe: true,
+      });
       const tokenPayload = jwt.verify(mutationResponse.data.data.login.token, Env.JWT_SECRET) as jwt.JwtPayload;
       const tokenDuration = tokenPayload.exp - tokenPayload.iat;
 
@@ -109,13 +113,14 @@ export const loginTests = (testServerUrl: string) => {
     interface Credentials {
       email: string;
       password: string;
+      rememberMe?: boolean;
     }
 
-    function makeLoginMutationRequest(credentials: Credentials, rememberMe = false) {
+    function makeLoginMutationRequest(credentials: Credentials) {
       return makeGraphqlResquest(
         testServerUrl,
-        `mutation Login($credentials: Credentials, $rememberMe: Boolean) {
-          login(credentials: $credentials,rememberMe: $rememberMe) {
+        `mutation Login($credentials: Credentials) {
+          login(credentials: $credentials) {
             user {
               id
               name
@@ -125,7 +130,7 @@ export const loginTests = (testServerUrl: string) => {
             token
           }
         }`,
-        { credentials, rememberMe },
+        { credentials },
       );
     }
   });
