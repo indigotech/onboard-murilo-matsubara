@@ -1,5 +1,6 @@
 import { expect } from 'chai';
 import jwt from 'jsonwebtoken';
+import { BAD_REQUEST_ERROR_CODE } from '../../src/consts';
 import { dataSource } from '../../src/data-source';
 import { User } from '../../src/entities/user.entity';
 import { Env } from '../../src/utils/env';
@@ -66,7 +67,12 @@ export const loginTests = (testServerUrl: string) => {
 
       const mutationResponse = await makeLoginMutationRequest(credentials);
 
-      expect(mutationResponse.data.errors[0].name).to.be.equal('InvalidLoginCredentials');
+      expect(mutationResponse.data.errors[0]).to.be.deep.equal({
+        code: BAD_REQUEST_ERROR_CODE,
+        message: 'Invalid email or password',
+        additionalInfo: 'No user with a matching email and password was found',
+        name: 'InvalidLoginCredentials',
+      });
     });
 
     it('must return invalid credentials error (wrong password)', async () => {
@@ -83,7 +89,12 @@ export const loginTests = (testServerUrl: string) => {
 
       const mutationResponse = await makeLoginMutationRequest({ email: user.email, password: passwordTried });
 
-      expect(mutationResponse.data.errors[0].name).to.be.equal('InvalidLoginCredentials');
+      expect(mutationResponse.data.errors[0]).to.be.deep.equal({
+        code: BAD_REQUEST_ERROR_CODE,
+        message: 'Invalid email or password',
+        additionalInfo: 'No user with a matching email and password was found',
+        name: 'InvalidLoginCredentials',
+      });
     });
 
     interface Credentials {

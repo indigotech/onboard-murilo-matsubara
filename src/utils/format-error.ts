@@ -11,12 +11,11 @@ export function formatError(error: GraphQLError): any {
       additionalInfo: originalError.additionalInfo,
       name: originalError.name,
     };
-  } else {
-    return {
-      code: INTERNAL_SERVER_ERROR_CODE,
-      message: 'Unexpected server error',
-      additionalInfo: originalError?.message,
-      name: originalError?.name,
-    };
   }
+  return {
+    code: INTERNAL_SERVER_ERROR_CODE,
+    message: 'Unexpected server error',
+    additionalInfo: originalError?.message,
+    name: originalError?.name,
+  };
 }

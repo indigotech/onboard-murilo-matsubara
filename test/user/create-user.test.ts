@@ -1,4 +1,5 @@
 import { expect } from 'chai';
+import { BAD_REQUEST_ERROR_CODE } from '../../src/consts';
 import { dataSource } from '../../src/data-source';
 import { User } from '../../src/entities/user.entity';
 import { makeGraphqlResquest } from '../../src/utils/graphql';
@@ -39,7 +40,6 @@ export const createUserTests = (testServerUrl: string) => {
     });
 
     it('must return duplicated email error', async () => {
-      const expectedErrorName = 'DuplicatedEmail';
       const newUser = new User();
       newUser.birthDate = '2000-01-01';
       newUser.email = 'test@gmail.com';
@@ -53,12 +53,14 @@ export const createUserTests = (testServerUrl: string) => {
         password: newUser.password,
         birthDate: newUser.birthDate,
       });
+      const { name, message, code } = mutationResponse.data.errors[0];
 
-      expect(mutationResponse.data.errors[0].name).to.be.equal(expectedErrorName);
+      expect(name).to.be.equal('DuplicatedEmail');
+      expect(message).to.be.equal('Email is already in use');
+      expect(code).to.be.equal(BAD_REQUEST_ERROR_CODE);
     });
 
     it('must return invalid password error (minimun length)', async () => {
-      const expectedErrorName = 'InvalidPassword';
       const newUser = {
         name: 'Test',
         email: 'test@test.com',
@@ -72,13 +74,15 @@ export const createUserTests = (testServerUrl: string) => {
         password: newUser.password,
         birthDate: newUser.birthDate,
       });
+      const { name, message, additionalInfo, code } = mutationResponse.data.errors[0];
 
-      expect(mutationResponse.data.errors[0].name).to.be.equal(expectedErrorName);
-      expect(mutationResponse.data.errors[0].additionalInfo).to.contain(rulesErrorMessage['min_length']);
+      expect(name).to.be.equal('InvalidPassword');
+      expect(message).to.be.equal('Invalid password');
+      expect(code).to.be.equal(BAD_REQUEST_ERROR_CODE);
+      expect(additionalInfo).to.contain(rulesErrorMessage['min_length']);
     });
 
     it('must return invalid password error (one letter required)', async () => {
-      const expectedErrorName = 'InvalidPassword';
       const newUser = {
         name: 'Test',
         email: 'test@test.com',
@@ -92,13 +96,15 @@ export const createUserTests = (testServerUrl: string) => {
         password: newUser.password,
         birthDate: newUser.birthDate,
       });
+      const { name, message, additionalInfo, code } = mutationResponse.data.errors[0];
 
-      expect(mutationResponse.data.errors[0].name).to.be.equal(expectedErrorName);
-      expect(mutationResponse.data.errors[0].additionalInfo).to.contain(rulesErrorMessage['contain_letter']);
+      expect(name).to.be.equal('InvalidPassword');
+      expect(message).to.be.equal('Invalid password');
+      expect(code).to.be.equal(BAD_REQUEST_ERROR_CODE);
+      expect(additionalInfo).to.contain(rulesErrorMessage['contain_letter']);
     });
 
     it('must return invalid password error (one digit required)', async () => {
-      const expectedErrorName = 'InvalidPassword';
       const newUser = {
         name: 'Test',
         email: 'test@test.com',
@@ -112,9 +118,12 @@ export const createUserTests = (testServerUrl: string) => {
         password: newUser.password,
         birthDate: newUser.birthDate,
       });
+      const { name, message, additionalInfo, code } = mutationResponse.data.errors[0];
 
-      expect(mutationResponse.data.errors[0].name).to.be.equal(expectedErrorName);
-      expect(mutationResponse.data.errors[0].additionalInfo).to.contain(rulesErrorMessage['contain_digit']);
+      expect(name).to.be.equal('InvalidPassword');
+      expect(message).to.be.equal('Invalid password');
+      expect(code).to.be.equal(BAD_REQUEST_ERROR_CODE);
+      expect(additionalInfo).to.contain(rulesErrorMessage['contain_digit']);
     });
 
     interface UserMutationInput {
