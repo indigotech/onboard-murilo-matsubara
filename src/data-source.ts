@@ -3,14 +3,17 @@ import { DataSource } from 'typeorm';
 import { User } from './entities/user.entity';
 import { Env, isDevEnvironment } from './utils/env';
 
-export let dataSource: DataSource;
+export const dataSource = new DataSource({
+  type: 'postgres',
+  synchronize: isDevEnvironment(),
+  entities: [User],
+  migrations: [],
+  subscribers: [],
+});
 export async function setupDataSource() {
-  dataSource = await new DataSource({
-    type: 'postgres',
-    url: Env.DB_CONNECTION_STRING,
-    synchronize: isDevEnvironment(),
-    entities: [User],
-    migrations: [],
-    subscribers: [],
-  }).initialize();
+  dataSource
+    .setOptions({
+      url: Env.DB_CONNECTION_STRING,
+    })
+    .initialize();
 }
