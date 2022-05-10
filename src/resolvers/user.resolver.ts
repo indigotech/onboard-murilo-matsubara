@@ -1,4 +1,3 @@
-import jwt from 'jsonwebtoken';
 import { QueryFailedError } from 'typeorm';
 import { UNIQUE_CONSTRAINT_ERROR_CODE } from '../consts';
 import { dataSource } from '../data-source';
@@ -6,12 +5,16 @@ import { User } from '../entities/user.entity';
 import { CustomValidationError } from '../exceptions/custom-validation-error';
 import { InvalidLoginCredentials } from '../exceptions/invalid-login-credentials';
 import { InvalidPassword } from '../exceptions/invalid-password';
+import { GraphqlContext } from '../server';
+import { signJwt, verifyRequestAuthentication } from '../utils/auth';
 import { Env } from '../utils/env';
 import { checkPassword, hashPassword, isPasswordValid, rulesErrorMessage } from '../utils/password';
 
 export const userResolver = {
   Mutation: {
-    createUser: async function (_: never, { user }: { user: User }) {
+    createUser: async function (_: never, { user }: { user: User }, { expressContext }: GraphqlContext) {
+      verifyRequestAuthentication(expressContext.req);
+
       validatePassword(user);
       user.password = await hashPassword(user.password);
 
@@ -49,7 +52,7 @@ export const userResolver = {
         birthDate: matchingUser.birthDate,
       };
 
-      const token = jwt.sign(user, Env.JWT_SECRET, {
+      const token = signJwt(user, {
         expiresIn: credentials.rememberMe ? Env.JWT_REMEMBER_ME_EXPIRATION_TIME : Env.JWT_EXPIRATION_TIME,
       });
 
