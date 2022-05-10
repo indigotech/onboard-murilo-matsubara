@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import { BAD_REQUEST_ERROR_CODE } from '../../src/consts';
 import { dataSource } from '../../src/data-source';
 import { User } from '../../src/entities/user.entity';
+import { verifyJwt } from '../../src/utils/auth';
 import { Env } from '../../src/utils/env';
 import { makeGraphqlResquest } from '../../src/utils/graphql';
 import { hashPassword } from '../../src/utils/password';
@@ -25,7 +26,7 @@ export const loginTests = (testServerUrl: string) => {
       const { id } = await dataSource.manager.save(User, user);
 
       const mutationResponse = await makeLoginMutationRequest({ email: user.email, password: unhashedPassword });
-      const tokenPayload = jwt.verify(mutationResponse.data.data.login.token, Env.JWT_SECRET) as jwt.JwtPayload;
+      const tokenPayload = verifyJwt(mutationResponse.data.data.login.token) as jwt.JwtPayload;
       const tokenDuration = tokenPayload.exp - tokenPayload.iat;
 
       expect(mutationResponse.data.errors).to.be.undefined;
@@ -58,7 +59,7 @@ export const loginTests = (testServerUrl: string) => {
         password: unhashedPassword,
         rememberMe: true,
       });
-      const tokenPayload = jwt.verify(mutationResponse.data.data.login.token, Env.JWT_SECRET) as jwt.JwtPayload;
+      const tokenPayload = verifyJwt(mutationResponse.data.data.login.token) as jwt.JwtPayload;
       const tokenDuration = tokenPayload.exp - tokenPayload.iat;
 
       expect(mutationResponse.data.errors).to.be.undefined;
