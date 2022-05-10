@@ -44,4 +44,11 @@ export class Env {
     }
     return parseInt(process.env.JWT_EXPIRATION_TIME);
   }
+
+  static get JWT_REMEMBER_ME_EXPIRATION_TIME() {
+    if (!process.env.JWT_REMEMBER_ME_EXPIRATION_TIME) {
+      throw new EnvironmentVariableNotFound('JWT_REMEMBER_ME_EXPIRATION_TIME');
+    }
+    return parseInt(process.env.JWT_REMEMBER_ME_EXPIRATION_TIME);
+  }
 }
