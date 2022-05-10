@@ -36,6 +36,31 @@ export const loginTests = (testServerUrl: string) => {
       });
     });
 
+    it('must login succefully with longer expiry date when rememberMe is true', async () => {
+      const unhashedPassword = 'test123';
+
+      const user = new User();
+      user.birthDate = '2000-01-01';
+      user.email = 'test@test.com';
+      user.name = 'Test';
+
+      user.password = await hashPassword(unhashedPassword);
+      const { id } = await dataSource.manager.save(User, user);
+
+      const mutationResponse = await makeLoginMutationRequest({ email: user.email, password: unhashedPassword }, true);
+      const tokenPayload = jwt.verify(mutationResponse.data.data.login.token, Env.JWT_SECRET) as jwt.JwtPayload;
+      const tokenDuration = tokenPayload.exp - tokenPayload.iat;
+
+      expect(mutationResponse.data.errors).to.be.undefined;
+      expect(tokenDuration).to.be.equal(Env.JWT_REMEMBER_ME_EXPIRATION_TIME);
+      expect(mutationResponse.data.data.login.user).to.be.deep.equal({
+        name: user.name,
+        email: user.email,
+        birthDate: user.birthDate,
+        id,
+      });
+    });
+
     it('must return invalid credentials error (email not registered)', async () => {
       const credentials = { email: 'test@test.com', password: 'test123' };
 
@@ -66,11 +91,11 @@ export const loginTests = (testServerUrl: string) => {
       password: string;
     }
 
-    function makeLoginMutationRequest(credentials: Credentials) {
+    function makeLoginMutationRequest(credentials: Credentials, rememberMe = false) {
       return makeGraphqlResquest(
         testServerUrl,
-        `mutation Login($credentials: Credentials) {
-          login(credentials: $credentials) {
+        `mutation Login($credentials: Credentials, $rememberMe: Boolean) {
+          login(credentials: $credentials,rememberMe: $rememberMe) {
             user {
               id
               name
@@ -80,7 +105,7 @@ export const loginTests = (testServerUrl: string) => {
             token
           }
         }`,
-        { credentials },
+        { credentials, rememberMe },
       );
     }
   });
