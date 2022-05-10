@@ -1,6 +1,8 @@
 import { expect } from 'chai';
+import jwt from 'jsonwebtoken';
 import { dataSource } from '../../src/data-source';
 import { User } from '../../src/entities/user.entity';
+import { Env } from '../../src/utils/env';
 import { makeGraphqlResquest } from '../../src/utils/graphql';
 import { hashPassword } from '../../src/utils/password';
 
@@ -22,9 +24,10 @@ export const loginTests = (testServerUrl: string) => {
       const { id } = await dataSource.manager.save(User, user);
 
       const mutationResponse = await makeLoginMutationRequest({ email: user.email, password: unhashedPassword });
+      const tokenPayload = jwt.verify(mutationResponse.data.data.login.token, Env.JWT_SECRET);
 
       expect(mutationResponse.data.errors).to.be.undefined;
-      expect(mutationResponse.data.data.login.token).to.not.be.undefined;
+      expect(tokenPayload).to.not.be.empty;
       expect(mutationResponse.data.data.login.user).to.be.deep.equal({
         name: user.name,
         email: user.email,
