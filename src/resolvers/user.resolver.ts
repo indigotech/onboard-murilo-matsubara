@@ -1,18 +1,19 @@
 import { ValidationError } from 'apollo-server-core';
 import { QueryFailedError } from 'typeorm';
 import { UNIQUE_CONSTRAINT_ERROR_CODE } from '../consts';
-import { appDataSource } from '../data-source';
 import { User } from '../entities/user.entity';
-import { hashPassword, isPasswordValid } from '../utils/password';
+import { InvalidPassword } from '../exceptions/invalid-password';
+import { GraphqlContext } from '../server';
+import { hashPassword, isPasswordValid, rulesErrorMessage } from '../utils/password';
 
 export const userResolver = {
   Mutation: {
-    createUser: async function (_: never, { user }: { user: User }) {
+    createUser: async function (_: never, { user }: { user: User }, { dataSource }: GraphqlContext) {
       validatePassword(user);
       user.password = await hashPassword(user.password);
 
       try {
-        const newUser = await appDataSource.manager.save(User, user);
+        const newUser = await dataSource.manager.save(User, user);
         return {
           id: newUser.id,
           name: newUser.name,
@@ -30,7 +31,7 @@ export const userResolver = {
 function validatePassword(user: User) {
   const { valid, brokenRules } = isPasswordValid(user.password);
   if (!valid) {
-    throw new ValidationError(`Password: ${brokenRules}`);
+    throw new InvalidPassword(`Password: ${brokenRules.map((rule) => rulesErrorMessage[rule])}`);
   }
 }
 
