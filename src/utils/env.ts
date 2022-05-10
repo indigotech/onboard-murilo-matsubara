@@ -30,4 +30,18 @@ export class Env {
     }
     return parseInt(process.env.PASSWORD_KEY_LENGTH);
   }
+
+  static get JWT_SECRET() {
+    if (!process.env.JWT_SECRET) {
+      throw new EnvironmentVariableNotFound('JWT_SECRET');
+    }
+    return process.env.JWT_SECRET;
+  }
+
+  static get JWT_EXPIRATION_TIME() {
+    if (!process.env.JWT_EXPIRATION_TIME) {
+      throw new EnvironmentVariableNotFound('JWT_EXPIRATION_TIME');
+    }
+    return parseInt(process.env.JWT_EXPIRATION_TIME);
+  }
 }
