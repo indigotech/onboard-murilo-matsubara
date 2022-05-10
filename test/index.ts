@@ -31,8 +31,8 @@ describe('Hello query', () => {
   });
 });
 
-describe('CreateUser mutation', createUserTests(TEST_SERVER_URL));
-describe('Login mutation', loginTests(TEST_SERVER_URL));
+createUserTests(TEST_SERVER_URL);
+loginTests(TEST_SERVER_URL);
 
 after(() => {
   server.close();

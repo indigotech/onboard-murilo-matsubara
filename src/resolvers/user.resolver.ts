@@ -1,10 +1,12 @@
+import jwt from 'jsonwebtoken';
 import { QueryFailedError } from 'typeorm';
 import { UNIQUE_CONSTRAINT_ERROR_CODE } from '../consts';
-import { getDataSource } from '../data-source';
+import { dataSource } from '../data-source';
 import { User } from '../entities/user.entity';
 import { CustomValidationError } from '../exceptions/custom-validation-error';
 import { InvalidLoginCredentials } from '../exceptions/invalid-login-credentials';
 import { InvalidPassword } from '../exceptions/invalid-password';
+import { Env } from '../utils/env';
 import { checkPassword, hashPassword, isPasswordValid, rulesErrorMessage } from '../utils/password';
 
 export const userResolver = {
@@ -14,7 +16,7 @@ export const userResolver = {
       user.password = await hashPassword(user.password);
 
       try {
-        const newUser = await getDataSource().manager.save(User, user);
+        const newUser = await dataSource.manager.save(User, user);
         return {
           id: newUser.id,
           name: newUser.name,
@@ -28,7 +30,7 @@ export const userResolver = {
     },
 
     login: async function (_: never, { credentials }: { credentials: { email: string; password: string } }) {
-      const matchingUser = await getDataSource().manager.findOne(User, { where: { email: credentials.email } });
+      const matchingUser = await dataSource.manager.findOne(User, { where: { email: credentials.email } });
 
       if (!matchingUser) {
         throw new InvalidLoginCredentials();
@@ -38,15 +40,18 @@ export const userResolver = {
       if (!passwordMatch) {
         throw new InvalidLoginCredentials();
       }
+      const user = {
+        id: matchingUser.id,
+        name: matchingUser.name,
+        email: matchingUser.email,
+        birthDate: matchingUser.birthDate,
+      };
+
+      const token = jwt.sign(user, Env.JWT_SECRET, { expiresIn: Env.JWT_EXPIRATION_TIME });
 
       return {
-        user: {
-          id: matchingUser.id,
-          name: matchingUser.name,
-          email: matchingUser.email,
-          birthDate: matchingUser.birthDate,
-        },
-        token: 'your_token',
+        user,
+        token,
       };
     },
   },

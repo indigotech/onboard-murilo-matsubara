@@ -3,7 +3,7 @@ import { ApolloServer, ExpressContext } from 'apollo-server-express';
 import express from 'express';
 import http from 'http';
 import { DataSource } from 'typeorm';
-import { getDataSource } from './data-source';
+import { setupDataSource } from './data-source';
 import { helloResolver } from './resolvers/hello.resolver';
 import { userResolver } from './resolvers/user.resolver';
 import { helloTypeDef } from './types/hello.type';
@@ -24,7 +24,7 @@ async function configAndInitilizeServer() {
   const PORT = Env.APP_PORT;
   const PATH = Env.GRAPHQL_PATH;
 
-  await getDataSource().initialize();
+  await setupDataSource();
 
   const server = await startApolloServer([userTypeDef, helloTypeDef], [userResolver, helloResolver], PORT, PATH);
 
