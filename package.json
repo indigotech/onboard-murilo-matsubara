@@ -12,7 +12,7 @@
         "build": "tsc",
         "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
         "prettier": "prettier --write .",
-        "seeds": "ts-node src/seeds/users.ts"
+        "seeds": "ts-node src/seeds/index.ts"
     },
     "repository": {
         "type": "git",

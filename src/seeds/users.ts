@@ -1,20 +1,12 @@
 import { faker } from '@faker-js/faker';
-import { config as makeDotenvAvailable } from 'dotenv';
-import { dataSource, setupDataSource } from '../data-source';
+import { DataSource } from 'typeorm';
 import { User } from '../entities/user.entity';
 import { hashPassword } from '../utils/password';
 
-async function seed() {
-  makeDotenvAvailable();
-  await setupDataSource();
+export async function seedUsers(userCount: number, dataSource: DataSource) {
+  const newUsers = await createRandomUsers(userCount);
 
-  const usersToCreate = 50;
-  console.log(`Creating ${usersToCreate} random users...`);
-  const newUsers = await createRandomUsers(usersToCreate);
-
-  console.log('Seeding database with created users...');
-  await dataSource.manager.save(User, newUsers);
-  console.log('Seeding completed!');
+  return await dataSource.manager.save(User, newUsers);
 }
 
 async function createRandomUsers(number: number) {
@@ -30,5 +22,3 @@ async function randomUser(): Promise<User> {
 
   return user;
 }
-
-seed();
