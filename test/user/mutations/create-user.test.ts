@@ -1,10 +1,10 @@
 import { expect } from 'chai';
-import { BAD_REQUEST_ERROR_CODE, UNAUTHORIZED_ERROR_CODE } from '../../src/consts';
-import { dataSource } from '../../src/data-source';
-import { User } from '../../src/entities/user.entity';
-import { signJwt } from '../../src/utils/auth';
-import { makeGraphqlResquest } from '../../src/utils/graphql';
-import { checkPassword, rulesErrorMessage } from '../../src/utils/password';
+import { BAD_REQUEST_ERROR_CODE, UNAUTHORIZED_ERROR_CODE } from '../../../src/consts';
+import { dataSource } from '../../../src/data-source';
+import { User } from '../../../src/entities/user.entity';
+import { signJwt } from '../../../src/utils/auth';
+import { makeGraphqlResquest } from '../../../src/utils/graphql';
+import { checkPassword, rulesErrorMessage } from '../../../src/utils/password';
 
 export const createUserTests = (testServerUrl: string) => {
   describe('CreateUser mutation', () => {
