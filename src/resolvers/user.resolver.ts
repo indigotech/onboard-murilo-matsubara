@@ -1,19 +1,19 @@
 import { ValidationError } from 'apollo-server-core';
 import { QueryFailedError } from 'typeorm';
 import { UNIQUE_CONSTRAINT_ERROR_CODE } from '../consts';
+import { getDataSource } from '../data-source';
 import { User } from '../entities/user.entity';
 import { InvalidPassword } from '../exceptions/invalid-password';
-import { GraphqlContext } from '../server';
 import { hashPassword, isPasswordValid, rulesErrorMessage } from '../utils/password';
 
 export const userResolver = {
   Mutation: {
-    createUser: async function (_: never, { user }: { user: User }, { dataSource }: GraphqlContext) {
+    createUser: async function (_: never, { user }: { user: User }) {
       validatePassword(user);
       user.password = await hashPassword(user.password);
 
       try {
-        const newUser = await dataSource.manager.save(User, user);
+        const newUser = await getDataSource().manager.save(User, user);
         return {
           id: newUser.id,
           name: newUser.name,
