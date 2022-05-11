@@ -137,13 +137,13 @@ export const createUserTests = (testServerUrl: string) => {
       return makeGraphqlResquest(
         testServerUrl,
         `mutation CreateUser($user: UserInput) {
-                  createUser(user: $user) {
-                    id
-                    name
-                    email
-                    birthDate
-                  }
-                }`,
+          createUser(user: $user) {
+            id
+            name
+            email
+            birthDate
+          }
+        }`,
         { user },
       );
     }
