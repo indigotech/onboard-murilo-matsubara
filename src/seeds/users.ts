@@ -8,10 +8,13 @@ async function seed() {
   makeDotenvAvailable();
   await setupDataSource();
 
-  const userToCreate = 50;
-  const newUsers = await createRandomUsers(userToCreate);
+  const usersToCreate = 50;
+  console.log(`Creating ${usersToCreate} random users...`);
+  const newUsers = await createRandomUsers(usersToCreate);
 
+  console.log('Seeding database with created users...');
   await dataSource.manager.save(User, newUsers);
+  console.log('Seeding completed!');
 }
 
 async function createRandomUsers(number: number) {
@@ -24,8 +27,6 @@ async function randomUser(): Promise<User> {
   user.email = faker.internet.email();
   user.birthDate = faker.date.between('1940-01-01', new Date()).toISOString().slice(0, 10);
   user.password = await hashPassword(faker.internet.password());
-
-  console.log(user);
 
   return user;
 }
