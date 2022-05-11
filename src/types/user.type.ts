@@ -33,4 +33,8 @@ export const userTypeDef = gql`
   type Mutation {
     login(credentials: Credentials): LoginResponse
   }
+
+  type Query {
+    user(id: Int!): User
+  }
 `;
