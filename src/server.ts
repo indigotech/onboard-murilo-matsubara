@@ -7,12 +7,9 @@ import { helloResolver } from './resolvers/hello.resolver';
 import { userResolver } from './resolvers/user.resolver';
 import { helloTypeDef } from './types/hello.type';
 import { userTypeDef } from './types/user.type';
+import { context } from './utils/context';
 import { Env } from './utils/env';
 import { formatError } from './utils/format-error';
-
-export interface GraphqlContext {
-  expressContext: ExpressContext;
-}
 
 export async function setupServer() {
   const server = await configAndInitilizeServer();
@@ -44,9 +41,7 @@ export async function startApolloServer(
     typeDefs,
     resolvers,
     formatError,
-    context: (expressContext) => ({
-      expressContext,
-    }),
+    context,
     plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
   });
 

@@ -10,9 +10,8 @@ export interface TokenPayload {
   birthDate: string;
 }
 
-export function verifyRequestAuthentication(request: Request): TokenPayload {
-  const authHeader = request.headers.authorization;
-  if (!authHeader) {
+export function validateJwt(token: string | undefined): TokenPayload {
+  if (!token) {
     throw new UnauthenticatedError(
       'You must be logged in',
       'No jwt token was provided in the Authorization header',
@@ -21,8 +20,6 @@ export function verifyRequestAuthentication(request: Request): TokenPayload {
   }
 
   try {
-    const token = extractToken(authHeader);
-
     return verifyJwt(token) as TokenPayload;
   } catch (error) {
     if (error instanceof TokenExpiredError) {
@@ -35,6 +32,11 @@ export function verifyRequestAuthentication(request: Request): TokenPayload {
 
     throw error;
   }
+}
+
+export function extractJwtFromRequest(request: Request): string | undefined {
+  const authHeader = request.headers.authorization;
+  return authHeader === undefined ? undefined : extractToken(authHeader);
 }
 
 function extractToken(authHeader: string) {

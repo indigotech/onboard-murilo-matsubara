@@ -5,15 +5,15 @@ import { User } from '../entities/user.entity';
 import { CustomValidationError } from '../exceptions/custom-validation-error';
 import { InvalidLoginCredentials } from '../exceptions/invalid-login-credentials';
 import { InvalidPassword } from '../exceptions/invalid-password';
-import { GraphqlContext } from '../server';
-import { signJwt, verifyRequestAuthentication } from '../utils/auth';
+import { signJwt, validateJwt } from '../utils/auth';
+import { GraphqlContext } from '../utils/context';
 import { Env } from '../utils/env';
 import { checkPassword, hashPassword, isPasswordValid, rulesErrorMessage } from '../utils/password';
 
 export const userResolver = {
   Mutation: {
-    createUser: async function (_: never, { user }: { user: User }, { expressContext }: GraphqlContext) {
-      verifyRequestAuthentication(expressContext.req);
+    createUser: async function (_: never, { user }: { user: User }, { jwt }: GraphqlContext) {
+      validateJwt(jwt);
 
       validatePassword(user);
       user.password = await hashPassword(user.password);
