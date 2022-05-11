@@ -2,7 +2,7 @@ import crypto from 'crypto';
 import { PASSWORD_MIN_LENGTH, SALT_SEPARATOR } from '../consts';
 import { Env } from './env';
 
-type PasswordRule = 'contain_digit' | 'contain_letter' | 'min_length';
+export type PasswordRule = 'contain_digit' | 'contain_letter' | 'min_length';
 type PasswordRuleChecker = (password: string) => boolean;
 
 const passwordRules: Record<PasswordRule, PasswordRuleChecker> = {
