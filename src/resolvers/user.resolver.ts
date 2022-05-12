@@ -7,6 +7,7 @@ import { InvalidLoginCredentials } from '../exceptions/invalid-login-credentials
 import { InvalidPassword } from '../exceptions/invalid-password';
 import { signJwt, validateJwt } from '../utils/auth';
 import { GraphqlContext } from '../utils/context';
+import { toDateString } from '../utils/date';
 import { Env } from '../utils/env';
 import { checkPassword, hashPassword, isPasswordValid, rulesErrorMessage } from '../utils/password';
 
@@ -91,6 +92,10 @@ export const userResolver = {
     users: async (_: never, { options }: { options: UsersQueryOptions }, { jwt }: GraphqlContext) => {
       validateJwt(jwt);
 
+      if (options.pageSize < 1) {
+        throw new CustomValidationError('Invalid page size', 'Page size must be greater than 0', 'InvalidPageSize');
+      }
+
       const [{ users, nextPageFirstUserId }, userCount, [firstUser]] = await Promise.all([
         paginatedUsers(options),
         dataSource.manager.count(User),
@@ -127,6 +132,7 @@ function handleUserCreationError(error: Error): never {
 async function paginatedUsers(options: UsersQueryOptions) {
   // Fetch one more user to check if there are pages
   const users = await fetchPaginatedUsers({ ...options, pageSize: options.pageSize + 1 });
+
   const hasNextPage = users.length > options.pageSize;
   const pageLastIndex = users.length - 1;
 
@@ -137,8 +143,9 @@ async function paginatedUsers(options: UsersQueryOptions) {
 }
 
 async function fetchPaginatedUsers(options: UsersQueryOptions): Promise<User[]> {
+  let users: User[];
   if (options.pageFirstUserId !== undefined) {
-    return await dataSource.query(
+    users = await dataSource.query(
       `select id, name, email, "birthDate"
       from public.user
       where (name, id) >= (
@@ -150,12 +157,18 @@ async function fetchPaginatedUsers(options: UsersQueryOptions): Promise<User[]> 
       limit $1 offset $2`,
       [options.pageSize, options.skip, options.pageFirstUserId],
     );
+  } else {
+    users = await dataSource.query(
+      `select id, name, email, "birthDate"
+        from public.user
+        order by name, id asc
+        limit $1 offset $2`,
+      [options.pageSize, options.skip],
+    );
   }
-  return await dataSource.query(
-    `select id, name, email, "birthDate"
-      from public.user
-      order by name, id asc
-      limit $1 offset $2`,
-    [options.pageSize, options.skip],
-  );
+
+  for (const user of users) {
+    user.birthDate = toDateString(user.birthDate as unknown as Date);
+  }
+  return users;
 }

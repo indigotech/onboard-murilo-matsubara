@@ -1,4 +1,5 @@
 import { gql } from 'apollo-server-core';
+import { DEFAULT_USERS_QUERY_PAGE_SIZE } from '../consts';
 
 export const userTypeDef = gql`
   input UserInput {
@@ -27,7 +28,7 @@ export const userTypeDef = gql`
   }
 
   input UsersQueryOptions {
-    pageSize: Int = 30
+    pageSize: Int = ${DEFAULT_USERS_QUERY_PAGE_SIZE}
     skip: Int = 0
     pageFirstUserId: Int
   }
