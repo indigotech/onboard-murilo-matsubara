@@ -150,13 +150,12 @@ async function fetchPaginatedUsers(options: UsersQueryOptions): Promise<User[]> 
       limit $1 offset $2`,
       [options.pageSize, options.skip, options.pageFirstUserId],
     );
-  } else {
-    return await dataSource.query(
-      `select id, name, email, "birthDate"
+  }
+  return await dataSource.query(
+    `select id, name, email, "birthDate"
       from public.user
       order by name, id asc
       limit $1 offset $2`,
-      [options.pageSize, options.skip],
-    );
-  }
+    [options.pageSize, options.skip],
+  );
 }
