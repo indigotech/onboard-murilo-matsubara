@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { BAD_REQUEST_ERROR_CODE, UNAUTHORIZED_ERROR_CODE } from '../../../src/consts';
-import { dataSource } from '../../../src/data-source';
+import { dataSource, purgeDataSource } from '../../../src/data-source';
 import { User } from '../../../src/entities/user.entity';
 import { signJwt } from '../../../src/utils/auth';
 import { makeGraphqlResquest } from '../../../src/utils/graphql';
@@ -13,7 +13,7 @@ export const userTests = (testServerUrl: string) => {
     let onlyUserPayload: { id: number; name: string; email: string; birthDate: string };
 
     before(async () => {
-      await dataSource.manager.clear(User);
+      await purgeDataSource(dataSource);
 
       onlyUser = new User();
       onlyUser.name = 'Test';
@@ -68,7 +68,7 @@ export const userTests = (testServerUrl: string) => {
     });
 
     after(async () => {
-      await dataSource.manager.clear(User);
+      await purgeDataSource(dataSource);
     });
 
     function makeUserQueryRequest(id: number, token?: string) {

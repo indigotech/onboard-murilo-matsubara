@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import jwt from 'jsonwebtoken';
 import { BAD_REQUEST_ERROR_CODE } from '../../../src/consts';
-import { dataSource } from '../../../src/data-source';
+import { dataSource, purgeDataSource } from '../../../src/data-source';
 import { User } from '../../../src/entities/user.entity';
 import { verifyJwt } from '../../../src/utils/auth';
 import { Env } from '../../../src/utils/env';
@@ -11,7 +11,7 @@ import { hashPassword } from '../../../src/utils/password';
 export const loginTests = (testServerUrl: string) => {
   describe('Login mutation', () => {
     beforeEach(async () => {
-      await dataSource.manager.clear(User);
+      await purgeDataSource(dataSource);
     });
 
     it('must login sucessfully', async () => {

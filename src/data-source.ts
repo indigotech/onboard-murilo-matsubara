@@ -10,10 +10,17 @@ export const dataSource = new DataSource({
   migrations: [],
   subscribers: [],
 });
-export async function setupDataSource() {
-  dataSource
+
+export async function setupDataSource(dataSource: DataSource) {
+  return dataSource
     .setOptions({
       url: Env.DB_CONNECTION_STRING,
     })
     .initialize();
+}
+
+export async function purgeDataSource(dataSource: DataSource) {
+  const entities = dataSource.entityMetadatas;
+  const clearPromises = entities.map((entity) => dataSource.getRepository(entity.name).clear());
+  await Promise.all(clearPromises);
 }
