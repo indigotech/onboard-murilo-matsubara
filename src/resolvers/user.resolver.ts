@@ -10,6 +10,18 @@ import { GraphqlContext } from '../utils/context';
 import { Env } from '../utils/env';
 import { checkPassword, hashPassword, isPasswordValid, rulesErrorMessage } from '../utils/password';
 
+interface Credentials {
+  email: string;
+  password: string;
+  rememberMe?: boolean;
+}
+
+interface UsersQueryOptions {
+  pageSize: number;
+  skip: number;
+  pageFirstUserId?: number;
+}
+
 export const userResolver = {
   Mutation: {
     createUser: async function (_: never, { user }: { user: User }, { jwt }: GraphqlContext) {
@@ -31,10 +43,7 @@ export const userResolver = {
       }
     },
 
-    login: async function (
-      _: never,
-      { credentials }: { credentials: { email: string; password: string; rememberMe: boolean } },
-    ) {
+    login: async function (_: never, { credentials }: { credentials: Credentials }) {
       const matchingUser = await dataSource.manager.findOne(User, { where: { email: credentials.email } });
 
       if (!matchingUser) {
@@ -78,6 +87,25 @@ export const userResolver = {
 
       return user;
     },
+
+    users: async (_: never, { options }: { options: UsersQueryOptions }, { jwt }: GraphqlContext) => {
+      validateJwt(jwt);
+
+      const [{ users, nextPageFirstUserId }, userCount, [firstUser]] = await Promise.all([
+        paginatedUsers(options),
+        dataSource.manager.count(User),
+        dataSource.manager.find(User, { take: 1, order: { name: 'ASC', id: 'ASC' } }),
+      ]);
+
+      const hasPreviousPage = firstUser !== undefined && users[0].id !== firstUser.id;
+
+      return {
+        users,
+        nextPageFirstUserId,
+        userCount,
+        hasPreviousPage,
+      };
+    },
   },
 };
 
@@ -94,4 +122,41 @@ function handleUserCreationError(error: Error): never {
   }
 
   throw error;
+}
+
+async function paginatedUsers(options: UsersQueryOptions) {
+  // Fetch one more user to check if there are pages
+  const users = await fetchPaginatedUsers({ ...options, pageSize: options.pageSize + 1 });
+  const hasNextPage = users.length > options.pageSize;
+  const pageLastIndex = users.length - 1;
+
+  return {
+    users: hasNextPage ? users.slice(0, pageLastIndex) : users,
+    nextPageFirstUserId: hasNextPage ? users[pageLastIndex].id : undefined,
+  };
+}
+
+async function fetchPaginatedUsers(options: UsersQueryOptions): Promise<User[]> {
+  if (options.pageFirstUserId !== undefined) {
+    return await dataSource.query(
+      `select id, name, email, "birthDate"
+      from public.user
+      where (name, id) >= (
+        select name, id
+        from public.user
+        where id = $3
+      )
+      order by name, id asc
+      limit $1 offset $2`,
+      [options.pageSize, options.skip, options.pageFirstUserId],
+    );
+  } else {
+    return await dataSource.query(
+      `select id, name, email, "birthDate"
+      from public.user
+      order by name, id asc
+      limit $1 offset $2`,
+      [options.pageSize, options.skip],
+    );
+  }
 }

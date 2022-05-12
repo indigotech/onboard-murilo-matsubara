@@ -15,10 +15,6 @@ export const userTypeDef = gql`
     birthDate: String
   }
 
-  type Mutation {
-    createUser(user: UserInput): User
-  }
-
   input Credentials {
     email: String
     password: String
@@ -30,11 +26,26 @@ export const userTypeDef = gql`
     token: String
   }
 
+  input UsersQueryOptions {
+    pageSize: Int = 30
+    skip: Int = 0
+    pageFirstUserId: Int
+  }
+
+  type UsersQueryResponse {
+    users: [User]
+    userCount: Int
+    nextPageFirstUserId: Int
+    hasPreviousPage: Boolean
+  }
+
   type Mutation {
+    createUser(user: UserInput): User
     login(credentials: Credentials): LoginResponse
   }
 
   type Query {
     user(id: Int!): User
+    users(options: UsersQueryOptions): UsersQueryResponse
   }
 `;
