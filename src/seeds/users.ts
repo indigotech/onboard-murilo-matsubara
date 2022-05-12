@@ -1,6 +1,7 @@
 import { faker } from '@faker-js/faker';
 import { DataSource } from 'typeorm';
 import { User } from '../entities/user.entity';
+import { toDateString } from '../utils/date';
 import { hashPassword } from '../utils/password';
 
 export async function seedUsers(userCount: number, dataSource: DataSource) {
@@ -17,7 +18,7 @@ async function randomUser(): Promise<User> {
   const user = new User();
   user.name = faker.name.findName();
   user.email = faker.internet.email();
-  user.birthDate = faker.date.between('1940-01-01', new Date()).toISOString().slice(0, 10);
+  user.birthDate = toDateString(faker.date.between('1940-01-01', new Date()));
   user.password = await hashPassword(faker.internet.password());
 
   return user;
