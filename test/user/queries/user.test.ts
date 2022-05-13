@@ -36,7 +36,7 @@ export const userTests = (testServerUrl: string) => {
     });
 
     it('must return user not found error', async () => {
-      const id = 1;
+      const id = -1;
 
       const queryResponse = await makeUserQueryRequest(id, token);
 
