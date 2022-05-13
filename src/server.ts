@@ -2,18 +2,14 @@ import { ApolloServerPluginDrainHttpServer, Config } from 'apollo-server-core';
 import { ApolloServer, ExpressContext } from 'apollo-server-express';
 import express from 'express';
 import http from 'http';
-import { DataSource } from 'typeorm';
 import { setupDataSource } from './data-source';
 import { helloResolver } from './resolvers/hello.resolver';
 import { userResolver } from './resolvers/user.resolver';
 import { helloTypeDef } from './types/hello.type';
 import { userTypeDef } from './types/user.type';
+import { context } from './utils/context';
 import { Env } from './utils/env';
 import { formatError } from './utils/format-error';
-
-export interface GraphqlContext {
-  dataSource: DataSource;
-}
 
 export async function setupServer() {
   const server = await configAndInitilizeServer();
@@ -45,6 +41,7 @@ export async function startApolloServer(
     typeDefs,
     resolvers,
     formatError,
+    context,
     plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
   });
 
