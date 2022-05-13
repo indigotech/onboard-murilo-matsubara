@@ -47,7 +47,7 @@ export const userTests = (testServerUrl: string) => {
           code: BAD_REQUEST_ERROR_CODE,
           name: 'UserNotFound',
           message: 'User not found',
-          additionalInfo: `Ùser with id ${id} not found in the database`,
+          additionalInfo: `User with id ${id} not found in the database`,
         },
       ]);
     });

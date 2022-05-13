@@ -71,7 +71,7 @@ export const userResolver = {
       if (!user) {
         throw new CustomValidationError(
           'User not found',
-          `Ùser with id ${id} not found in the database`,
+          `User with id ${id} not found in the database`,
           'UserNotFound',
         );
       }
