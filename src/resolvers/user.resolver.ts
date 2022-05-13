@@ -29,7 +29,10 @@ export const userResolver = {
       }
     },
 
-    login: async function (_: never, { credentials }: { credentials: { email: string; password: string } }) {
+    login: async function (
+      _: never,
+      { credentials, rememberMe }: { credentials: { email: string; password: string }; rememberMe: boolean },
+    ) {
       const matchingUser = await dataSource.manager.findOne(User, { where: { email: credentials.email } });
 
       if (!matchingUser) {
@@ -47,7 +50,9 @@ export const userResolver = {
         birthDate: matchingUser.birthDate,
       };
 
-      const token = jwt.sign(user, Env.JWT_SECRET, { expiresIn: Env.JWT_EXPIRATION_TIME });
+      const token = jwt.sign(user, Env.JWT_SECRET, {
+        expiresIn: rememberMe ? Env.JWT_REMEMBER_ME_EXPIRATION_TIME : Env.JWT_EXPIRATION_TIME,
+      });
 
       return {
         user,

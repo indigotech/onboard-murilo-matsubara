@@ -30,6 +30,6 @@ export const userTypeDef = gql`
   }
 
   type Mutation {
-    login(credentials: Credentials): LoginResponse
+    login(credentials: Credentials, rememberMe: Boolean): LoginResponse
   }
 `;
