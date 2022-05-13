@@ -14,6 +14,18 @@ export const userTypeDef = gql`
     name: String
     email: String
     birthDate: String
+    addresses: [Address]
+  }
+
+  type Address {
+    id: Int
+    postalCode: String
+    street: String
+    streetNumber: Int
+    complement: String
+    neighborhood: String
+    city: String
+    state: String
   }
 
   input Credentials {
