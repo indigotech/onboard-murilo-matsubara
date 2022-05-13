@@ -1,15 +1,18 @@
 import { expect } from 'chai';
-import { BAD_REQUEST_ERROR_CODE, UNAUTHORIZED_ERROR_CODE } from '../../src/consts';
-import { dataSource } from '../../src/data-source';
-import { User } from '../../src/entities/user.entity';
-import { signJwt } from '../../src/utils/auth';
-import { makeGraphqlResquest } from '../../src/utils/graphql';
-import { checkPassword, rulesErrorMessage } from '../../src/utils/password';
+import { BAD_REQUEST_ERROR_CODE, UNAUTHORIZED_ERROR_CODE } from '../../../src/consts';
+import { dataSource, purgeDataSource } from '../../../src/data-source';
+import { User } from '../../../src/entities/user.entity';
+import { signJwt } from '../../../src/utils/auth';
+import { makeGraphqlResquest } from '../../../src/utils/graphql';
+import { checkPassword, rulesErrorMessage } from '../../../src/utils/password';
 
 export const createUserTests = (testServerUrl: string) => {
+  const tokenPayload = { id: 1 };
+  const token = signJwt(tokenPayload);
+
   describe('CreateUser mutation', () => {
     beforeEach(async () => {
-      await dataSource.manager.clear(User);
+      await purgeDataSource(dataSource);
     });
 
     it('must create user sucessfully', async () => {
@@ -19,7 +22,6 @@ export const createUserTests = (testServerUrl: string) => {
         birthDate: '2000-01-01',
         password: 'test12',
       };
-      const token = signJwt({ name: newUser.name, email: newUser.email, birthDate: newUser.birthDate });
 
       const mutationResponse = await makeUserMutationRequest(newUser, token);
       const dbCreatedUser = await dataSource.manager.findOne(User, { where: { id: mutationResponse.data.id } });
@@ -47,7 +49,6 @@ export const createUserTests = (testServerUrl: string) => {
       newUser.email = 'test@gmail.com';
       newUser.name = 'Test';
       newUser.password = 'Test123!';
-      const token = signJwt({ name: newUser.name, email: newUser.email, birthDate: newUser.birthDate });
       await dataSource.manager.insert(User, newUser);
 
       const mutationResponse = await makeUserMutationRequest(
@@ -73,7 +74,6 @@ export const createUserTests = (testServerUrl: string) => {
         birthDate: '2000-01-01',
         password: 'test1',
       };
-      const token = signJwt({ name: newUser.name, email: newUser.email, birthDate: newUser.birthDate });
 
       const mutationResponse = await makeUserMutationRequest(
         {
@@ -99,7 +99,6 @@ export const createUserTests = (testServerUrl: string) => {
         birthDate: '2000-01-01',
         password: '12345678',
       };
-      const token = signJwt({ name: newUser.name, email: newUser.email, birthDate: newUser.birthDate });
 
       const mutationResponse = await makeUserMutationRequest(
         {
@@ -125,7 +124,6 @@ export const createUserTests = (testServerUrl: string) => {
         birthDate: '2000-01-01',
         password: 'testtest',
       };
-      const token = signJwt({ name: newUser.name, email: newUser.email, birthDate: newUser.birthDate });
 
       const mutationResponse = await makeUserMutationRequest(
         {
@@ -169,10 +167,10 @@ export const createUserTests = (testServerUrl: string) => {
         birthDate: '2000-01-01',
         password: 'test12',
       };
-      const token =
+      const invalidToken =
         'yJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MzAsIm5hbWUiOiJNdXJpbG8iLCJlbWFpbCI6Im11cmlsby5tYXRzdWJhcmFAZ21haWwuY29tIiwiYmlydGhEYXRlIjoiMTk5OC0xMC0wNSIsImlhdCI6MTY1MjE4Njg4OSwiZXhwIjoxNjUyMTg3MTg5fQ.CaHXfzrpeyMST5WYcXrfWCE4aEp-PGxGNfaLM0uFiX4';
 
-      const mutationResponse = await makeUserMutationRequest(newUser, token);
+      const mutationResponse = await makeUserMutationRequest(newUser, invalidToken);
 
       expect(mutationResponse.data.errors[0]).to.be.deep.equal({
         code: UNAUTHORIZED_ERROR_CODE,
@@ -189,10 +187,7 @@ export const createUserTests = (testServerUrl: string) => {
         birthDate: '2000-01-01',
         password: 'test12',
       };
-      const token = signJwt(
-        { name: newUser.name, email: newUser.email, birthDate: newUser.birthDate },
-        { expiresIn: -1 },
-      );
+      const token = signJwt(tokenPayload, { expiresIn: -1 });
 
       const mutationResponse = await makeUserMutationRequest(newUser, token);
 

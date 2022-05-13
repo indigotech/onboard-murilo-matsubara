@@ -5,8 +5,9 @@ import path from 'path';
 import { setupServer } from '../src/server';
 import { Env } from '../src/utils/env';
 import { makeGraphqlResquest } from '../src/utils/graphql';
-import { createUserTests } from './user/create-user.test';
-import { loginTests } from './user/login.test';
+import { createUserTests } from './user/mutations/create-user.test';
+import { loginTests } from './user/mutations/login.test';
+import { userTests } from './user/queries/user.test';
 
 makeDotenvAvailable({ path: path.resolve(process.cwd(), 'test.env') });
 let server: Server;
@@ -33,6 +34,7 @@ describe('Hello query', () => {
 
 createUserTests(TEST_SERVER_URL);
 loginTests(TEST_SERVER_URL);
+userTests(TEST_SERVER_URL);
 
 after(() => {
   server.close();

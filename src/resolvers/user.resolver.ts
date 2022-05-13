@@ -62,6 +62,23 @@ export const userResolver = {
       };
     },
   },
+
+  Query: {
+    user: async (_: never, { id }: { id: number }, { jwt }: GraphqlContext) => {
+      validateJwt(jwt);
+
+      const user = await dataSource.manager.findOne(User, { where: { id } });
+      if (!user) {
+        throw new CustomValidationError(
+          'User not found',
+          `User with id ${id} not found in the database`,
+          'UserNotFound',
+        );
+      }
+
+      return user;
+    },
+  },
 };
 
 function validatePassword(user: User) {
