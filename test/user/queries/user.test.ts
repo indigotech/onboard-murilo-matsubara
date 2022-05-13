@@ -6,7 +6,7 @@ import { signJwt } from '../../../src/utils/auth';
 import { makeGraphqlResquest } from '../../../src/utils/graphql';
 import { hashPassword } from '../../../src/utils/password';
 
-export const userTests = (testServerUrl: string) => {
+export const testUserQuery = (testServerUrl: string) => {
   describe('User query', () => {
     let onlyUser: User;
     let token: string;

@@ -6,7 +6,7 @@ import { signJwt } from '../../../src/utils/auth';
 import { makeGraphqlResquest } from '../../../src/utils/graphql';
 import { checkPassword, rulesErrorMessage } from '../../../src/utils/password';
 
-export const createUserTests = (testServerUrl: string) => {
+export const testCreateUserMutation = (testServerUrl: string) => {
   const tokenPayload = { id: 1 };
   const token = signJwt(tokenPayload);
 
