@@ -18,4 +18,18 @@ export const userTypeDef = gql`
   type Mutation {
     createUser(user: UserInput): User
   }
+
+  input Credentials {
+    email: String
+    password: String
+  }
+
+  type LoginResponse {
+    user: User
+    token: String
+  }
+
+  type Mutation {
+    login(credentials: Credentials): LoginResponse
+  }
 `;

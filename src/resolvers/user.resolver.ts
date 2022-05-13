@@ -2,9 +2,10 @@ import { QueryFailedError } from 'typeorm';
 import { UNIQUE_CONSTRAINT_ERROR_CODE } from '../consts';
 import { getDataSource } from '../data-source';
 import { User } from '../entities/user.entity';
+import { CustomValidationError } from '../exceptions/custom-validation-error';
+import { InvalidLoginCredentials } from '../exceptions/invalid-login-credentials';
 import { InvalidPassword } from '../exceptions/invalid-password';
-import { CustomValidationError } from '../exceptions/validation-error';
-import { hashPassword, isPasswordValid, rulesErrorMessage } from '../utils/password';
+import { checkPassword, hashPassword, isPasswordValid, rulesErrorMessage } from '../utils/password';
 
 export const userResolver = {
   Mutation: {
@@ -24,6 +25,29 @@ export const userResolver = {
         handleUserCreationError(error);
         return undefined;
       }
+    },
+
+    login: async function (_: never, { credentials }: { credentials: { email: string; password: string } }) {
+      const matchingUser = await getDataSource().manager.findOne(User, { where: { email: credentials.email } });
+
+      if (!matchingUser) {
+        throw new InvalidLoginCredentials();
+      }
+
+      const passwordMatch = await checkPassword(credentials.password, matchingUser.password);
+      if (!passwordMatch) {
+        throw new InvalidLoginCredentials();
+      }
+
+      return {
+        user: {
+          id: matchingUser.id,
+          name: matchingUser.name,
+          email: matchingUser.email,
+          birthDate: matchingUser.birthDate,
+        },
+        token: 'your_token',
+      };
     },
   },
 };

@@ -1,5 +1,5 @@
 import { PasswordRule } from '../utils/password';
-import { CustomValidationError } from './validation-error';
+import { CustomValidationError } from './custom-validation-error';
 
 export class InvalidPassword extends CustomValidationError {
   constructor(brokenRules: PasswordRule[], rulesMessages: Record<PasswordRule, string>) {
