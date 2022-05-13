@@ -10,7 +10,6 @@ export const userTests = (testServerUrl: string) => {
   describe('User query', () => {
     let onlyUser: User;
     let token: string;
-    let onlyUserPayload: { id: number; name: string; email: string; birthDate: string };
 
     before(async () => {
       await purgeDataSource(dataSource);
@@ -22,19 +21,18 @@ export const userTests = (testServerUrl: string) => {
       onlyUser.birthDate = '2000-01-01';
       onlyUser = await dataSource.manager.save(onlyUser);
 
-      onlyUserPayload = {
-        id: onlyUser.id,
-        name: onlyUser.name,
-        email: onlyUser.email,
-        birthDate: onlyUser.birthDate,
-      };
-      token = signJwt(onlyUserPayload);
+      token = signJwt({ id: onlyUser.id });
     });
 
     it('must return user data successfully', async () => {
       const queryResponse = await makeUserQueryRequest(onlyUser.id, token);
 
-      expect(queryResponse.data.data.user).to.be.deep.equal(onlyUserPayload);
+      expect(queryResponse.data.data.user).to.be.deep.equal({
+        id: onlyUser.id,
+        name: onlyUser.name,
+        email: onlyUser.email,
+        birthDate: onlyUser.birthDate,
+      });
     });
 
     it('must return user not found error', async () => {
