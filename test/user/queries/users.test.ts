@@ -199,10 +199,20 @@ export const testUsersQuery = (testServerUrl: string) => {
         `query Users($options: UsersQueryOptions) {
             users(options: $options) {
                 users {
-                id
-                name
-                email
-                birthDate
+                  id
+                  name
+                  email
+                  birthDate
+                  addresses {
+                    id
+                    street
+                    streetNumber
+                    complement
+                    neighborhood
+                    postalCode
+                    city
+                    state
+                  }
                 }
                 userCount
                 nextPageFirstUserId
@@ -223,6 +233,7 @@ export const testUsersQuery = (testServerUrl: string) => {
           name: user.name,
           email: user.email,
           birthDate: user.birthDate,
+          addresses: user.addresses,
         }))
         .sort((userA, userB) => {
           if (userA.name === userB.name) {

@@ -13,7 +13,8 @@ export const testUserEntity = () => {
     it('must create an user with 2 addresses', async () => {
       const address1 = new Address();
       address1.state = 'São Paulo';
-      (address1.city = 'São Paulo'), (address1.neighborhood = 'Sumaré');
+      address1.city = 'São Paulo';
+      address1.neighborhood = 'Sumaré';
       address1.postalCode = '01255-000';
       address1.street = 'Av. Dr. Arnaldo';
       address1.streetNumber = 2194;
