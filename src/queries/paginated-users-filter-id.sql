@@ -6,4 +6,4 @@ where (name, id) >= (
     where id = $3
 )
 order by name, id asc
-limit $1 offset $2
+limit $1 offset $2;
