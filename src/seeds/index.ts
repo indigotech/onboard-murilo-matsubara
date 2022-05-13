@@ -5,7 +5,7 @@ import { seedUsers } from './users';
 async function seed() {
   makeDotenvAvailable();
   console.log('Setting up data source...');
-  await setupDataSource();
+  await setupDataSource(dataSource);
 
   console.log('Seeding users...');
   await seedUsers(50, dataSource);

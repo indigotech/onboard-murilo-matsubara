@@ -5,6 +5,7 @@ import { User } from '../entities/user.entity';
 import { CustomValidationError } from '../exceptions/custom-validation-error';
 import { InvalidLoginCredentials } from '../exceptions/invalid-login-credentials';
 import { InvalidPassword } from '../exceptions/invalid-password';
+import { Queries } from '../queries/queries';
 import { signJwt, validateJwt } from '../utils/auth';
 import { GraphqlContext } from '../utils/context';
 import { toDateString } from '../utils/date';
@@ -130,7 +131,7 @@ function handleUserCreationError(error: Error): never {
 }
 
 async function paginatedUsers(options: UsersQueryOptions) {
-  // Fetch one more user to check if there are pages
+  // Fetch one more user to check if there are more pages
   const users = await fetchPaginatedUsers({ ...options, pageSize: options.pageSize + 1 });
 
   const hasNextPage = users.length > options.pageSize;
@@ -145,26 +146,13 @@ async function paginatedUsers(options: UsersQueryOptions) {
 async function fetchPaginatedUsers(options: UsersQueryOptions): Promise<User[]> {
   let users: User[];
   if (options.pageFirstUserId !== undefined) {
-    users = await dataSource.query(
-      `select id, name, email, "birthDate"
-      from public.user
-      where (name, id) >= (
-        select name, id
-        from public.user
-        where id = $3
-      )
-      order by name, id asc
-      limit $1 offset $2`,
-      [options.pageSize, options.skip, options.pageFirstUserId],
-    );
+    users = await dataSource.query(Queries.paginatedUsersFilterId, [
+      options.pageSize,
+      options.skip,
+      options.pageFirstUserId,
+    ]);
   } else {
-    users = await dataSource.query(
-      `select id, name, email, "birthDate"
-        from public.user
-        order by name, id asc
-        limit $1 offset $2`,
-      [options.pageSize, options.skip],
-    );
+    users = await dataSource.query(Queries.paginatedUsers, [options.pageSize, options.skip]);
   }
 
   for (const user of users) {
