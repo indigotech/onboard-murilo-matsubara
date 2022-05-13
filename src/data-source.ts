@@ -1,12 +1,13 @@
 import 'reflect-metadata';
 import { DataSource } from 'typeorm';
+import { Address } from './entities/address.entity';
 import { User } from './entities/user.entity';
 import { Env, isDevEnvironment } from './utils/env';
 
 export const dataSource = new DataSource({
   type: 'postgres',
   synchronize: isDevEnvironment(),
-  entities: [User],
+  entities: [User, Address],
   migrations: [],
   subscribers: [],
 });
@@ -21,6 +22,8 @@ export async function setupDataSource(dataSource: DataSource) {
 
 export async function purgeDataSource(dataSource: DataSource) {
   const entities = dataSource.entityMetadatas;
-  const clearPromises = entities.map((entity) => dataSource.getRepository(entity.name).clear());
-  await Promise.all(clearPromises);
+  const truncatePromises = entities
+    .map((entity) => `${entity.connection.driver.schema}.${entity.tableName}`)
+    .map((tableName) => dataSource.manager.query(`TRUNCATE ${tableName} CASCADE`));
+  await Promise.all(truncatePromises);
 }
