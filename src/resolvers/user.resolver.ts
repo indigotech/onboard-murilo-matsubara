@@ -150,8 +150,8 @@ async function fetchPaginatedUsers(options: UsersQueryOptions): Promise<User[]> 
       'user.name': 'ASC',
       'user.id': 'ASC',
     })
-    .limit(options.pageSize)
-    .offset(options.skip);
+    .take(options.pageSize)
+    .skip(options.skip);
 
   if (options.pageFirstUserId !== undefined) {
     queryBuilder.where(
