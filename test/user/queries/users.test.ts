@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { BAD_REQUEST_ERROR_CODE, DEFAULT_USERS_QUERY_PAGE_SIZE, UNAUTHORIZED_ERROR_CODE } from '../../../src/consts';
 import { dataSource, purgeDataSource } from '../../../src/data-source';
-import { seedUsers } from '../../../src/seeds/users';
+import { seedUsersWithAddresses } from '../../../src/seeds/users';
 import { signJwt } from '../../../src/utils/auth';
 import { makeGraphqlResquest } from '../../../src/utils/graphql';
 
@@ -225,7 +225,7 @@ export const testUsersQuery = (testServerUrl: string) => {
     }
 
     async function seedOrderedUsers(userCount: number) {
-      const seededUsers = await seedUsers(userCount, dataSource);
+      const seededUsers = await seedUsersWithAddresses(userCount, dataSource, 1);
 
       return seededUsers
         .map((user) => ({

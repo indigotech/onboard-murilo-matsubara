@@ -5,12 +5,20 @@ import { User } from '../entities/user.entity';
 import { toDateString } from '../utils/date';
 import { hashPassword } from '../utils/password';
 
-export async function seedUsers(userCount: number, dataSource: DataSource, withAddresses = 1) {
+export async function seedUsersWithAddresses(userCount: number, dataSource: DataSource, addressesForEachUser: number) {
+  return seedUsers(userCount, dataSource, addressesForEachUser);
+}
+
+export async function seedUsersWithoutAddress(userCount: number, dataSource: DataSource) {
+  return seedUsers(userCount, dataSource, 0);
+}
+
+async function seedUsers(userCount: number, dataSource: DataSource, addressesForEachUser = 1) {
   const newUsers = await createRandomUsers(userCount);
 
-  if (withAddresses > 0) {
+  if (addressesForEachUser > 0) {
     for (const newUser of newUsers) {
-      newUser.addresses = createRandomAddresses(withAddresses);
+      newUser.addresses = createRandomAddresses(addressesForEachUser);
     }
   }
 
