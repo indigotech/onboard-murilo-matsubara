@@ -5,10 +5,24 @@ import { User } from '../entities/user.entity';
 import { CustomValidationError } from '../exceptions/custom-validation-error';
 import { InvalidLoginCredentials } from '../exceptions/invalid-login-credentials';
 import { InvalidPassword } from '../exceptions/invalid-password';
+import { Queries } from '../queries/queries';
 import { signJwt, validateJwt } from '../utils/auth';
 import { GraphqlContext } from '../utils/context';
+import { toDateString } from '../utils/date';
 import { Env } from '../utils/env';
 import { checkPassword, hashPassword, isPasswordValid, rulesErrorMessage } from '../utils/password';
+
+interface Credentials {
+  email: string;
+  password: string;
+  rememberMe?: boolean;
+}
+
+interface UsersQueryOptions {
+  pageSize: number;
+  skip: number;
+  pageFirstUserId?: number;
+}
 
 export const userResolver = {
   Mutation: {
@@ -31,10 +45,7 @@ export const userResolver = {
       }
     },
 
-    login: async function (
-      _: never,
-      { credentials }: { credentials: { email: string; password: string; rememberMe: boolean } },
-    ) {
+    login: async function (_: never, { credentials }: { credentials: Credentials }) {
       const matchingUser = await dataSource.manager.findOne(User, { where: { email: credentials.email } });
 
       if (!matchingUser) {
@@ -78,6 +89,29 @@ export const userResolver = {
 
       return user;
     },
+
+    users: async (_: never, { options }: { options: UsersQueryOptions }, { jwt }: GraphqlContext) => {
+      validateJwt(jwt);
+
+      if (options.pageSize < 1) {
+        throw new CustomValidationError('Invalid page size', 'Page size must be greater than 0', 'InvalidPageSize');
+      }
+
+      const [{ users, nextPageFirstUserId }, userCount, [firstUser]] = await Promise.all([
+        paginatedUsers(options),
+        dataSource.manager.count(User),
+        dataSource.manager.find(User, { take: 1, order: { name: 'ASC', id: 'ASC' } }),
+      ]);
+
+      const hasPreviousPage = firstUser !== undefined && users[0].id !== firstUser.id;
+
+      return {
+        users,
+        nextPageFirstUserId,
+        userCount,
+        hasPreviousPage,
+      };
+    },
   },
 };
 
@@ -94,4 +128,35 @@ function handleUserCreationError(error: Error): never {
   }
 
   throw error;
+}
+
+async function paginatedUsers(options: UsersQueryOptions) {
+  // Fetch one more user to check if there are more pages
+  const users = await fetchPaginatedUsers({ ...options, pageSize: options.pageSize + 1 });
+
+  const hasNextPage = users.length > options.pageSize;
+  const pageLastIndex = users.length - 1;
+
+  return {
+    users: hasNextPage ? users.slice(0, pageLastIndex) : users,
+    nextPageFirstUserId: hasNextPage ? users[pageLastIndex].id : undefined,
+  };
+}
+
+async function fetchPaginatedUsers(options: UsersQueryOptions): Promise<User[]> {
+  let users: User[];
+  if (options.pageFirstUserId !== undefined) {
+    users = await dataSource.query(Queries.paginatedUsersFilterId, [
+      options.pageSize,
+      options.skip,
+      options.pageFirstUserId,
+    ]);
+  } else {
+    users = await dataSource.query(Queries.paginatedUsers, [options.pageSize, options.skip]);
+  }
+
+  for (const user of users) {
+    user.birthDate = toDateString(user.birthDate as unknown as Date);
+  }
+  return users;
 }
