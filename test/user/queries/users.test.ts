@@ -9,9 +9,6 @@ export const usersTests = (testServerUrl: string) => {
   describe('Users query', () => {
     const tokenPayload = {
       id: 1,
-      name: 'Test',
-      email: 'test@test.com',
-      birthDate: '2000-01-01',
     };
     const token = signJwt(tokenPayload);
 
@@ -19,12 +16,27 @@ export const usersTests = (testServerUrl: string) => {
       await purgeDataSource(dataSource);
     });
 
-    it('must return correctly paginated results', async () => {
+    it('must return correctly paginated results for first page', async () => {
       const pageSize = 4;
       const userCount = 10;
       const users = await seedOrderedUsers(userCount);
 
-      // First page
+      const firstPageResponse = await makeUsersQueryRequest({ pageSize }, token);
+      const firstPageResponseData = firstPageResponse.data.data.users;
+
+      expect(firstPageResponseData).to.be.deep.equal({
+        users: users.slice(0, 4),
+        userCount,
+        nextPageFirstUserId: users[4].id,
+        hasPreviousPage: false,
+      });
+    });
+
+    it('must return correctly paginated results for second page', async () => {
+      const pageSize = 4;
+      const userCount = 10;
+      const users = await seedOrderedUsers(userCount);
+
       const firstPageResponse = await makeUsersQueryRequest({ pageSize }, token);
       const firstPageResponseData = firstPageResponse.data.data.users;
 
@@ -34,25 +46,21 @@ export const usersTests = (testServerUrl: string) => {
       );
       const secondPageResponseData = secondPageResponse.data.data.users;
 
-      const thirdPageResponse = await makeUsersQueryRequest(
-        { pageSize, pageFirstUserId: secondPageResponseData.nextPageFirstUserId },
-        token,
-      );
-      const thirdPageResponseData = thirdPageResponse.data.data.users;
-
-      expect(firstPageResponseData).to.be.deep.equal({
-        users: users.slice(0, 4),
-        userCount,
-        nextPageFirstUserId: users[4].id,
-        hasPreviousPage: false,
-      });
-
       expect(secondPageResponseData).to.be.deep.equal({
         users: users.slice(4, 8),
         userCount,
         nextPageFirstUserId: users[8].id,
         hasPreviousPage: true,
       });
+    });
+
+    it('must return correctly paginated results for last page', async () => {
+      const pageSize = 4;
+      const userCount = 10;
+      const users = await seedOrderedUsers(userCount);
+
+      const thirdPageResponse = await makeUsersQueryRequest({ pageSize, pageFirstUserId: users[8].id }, token);
+      const thirdPageResponseData = thirdPageResponse.data.data.users;
 
       expect(thirdPageResponseData).to.be.deep.equal({
         users: users.slice(8, 10),
