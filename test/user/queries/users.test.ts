@@ -5,7 +5,7 @@ import { seedUsers } from '../../../src/seeds/users';
 import { signJwt } from '../../../src/utils/auth';
 import { makeGraphqlResquest } from '../../../src/utils/graphql';
 
-export const usersTests = (testServerUrl: string) => {
+export const testUsersQuery = (testServerUrl: string) => {
   describe('Users query', () => {
     const tokenPayload = {
       id: 1,

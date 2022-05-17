@@ -8,7 +8,7 @@ import { Env } from '../../../src/utils/env';
 import { makeGraphqlResquest } from '../../../src/utils/graphql';
 import { hashPassword } from '../../../src/utils/password';
 
-export const loginTests = (testServerUrl: string) => {
+export const testLoginMutation = (testServerUrl: string) => {
   describe('Login mutation', () => {
     beforeEach(async () => {
       await purgeDataSource(dataSource);
