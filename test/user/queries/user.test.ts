@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import { BAD_REQUEST_ERROR_CODE, UNAUTHORIZED_ERROR_CODE } from '../../../src/consts';
 import { dataSource, purgeDataSource } from '../../../src/data-source';
+import { Address } from '../../../src/entities/address.entity';
 import { User } from '../../../src/entities/user.entity';
 import { signJwt } from '../../../src/utils/auth';
 import { makeGraphqlResquest } from '../../../src/utils/graphql';
@@ -14,13 +15,25 @@ export const testUserQuery = (testServerUrl: string) => {
     before(async () => {
       await purgeDataSource(dataSource);
 
+      const address1 = new Address();
+      address1.state = 'São Paulo';
+      address1.city = 'São Paulo';
+      address1.neighborhood = 'Sumaré';
+      address1.postalCode = '01255-000';
+      address1.street = 'Av. Dr. Arnaldo';
+      address1.streetNumber = 2194;
+
+      const address2: Address = { ...address1 };
+      address2.complement = 'Taqtile';
+
       onlyUser = new User();
       onlyUser.name = 'Test';
       onlyUser.email = 'test@gmail.com';
       onlyUser.password = await hashPassword('test123');
       onlyUser.birthDate = '2000-01-01';
-      onlyUser = await dataSource.manager.save(onlyUser);
+      onlyUser.addresses = [address1, address2];
 
+      onlyUser = await dataSource.manager.save(onlyUser);
       token = signJwt({ id: onlyUser.id });
     });
 
@@ -32,6 +45,7 @@ export const testUserQuery = (testServerUrl: string) => {
         name: onlyUser.name,
         email: onlyUser.email,
         birthDate: onlyUser.birthDate,
+        addresses: onlyUser.addresses,
       });
     });
 
@@ -78,6 +92,16 @@ export const testUserQuery = (testServerUrl: string) => {
                 name
                 email
                 birthDate
+                addresses {
+                  id
+                  street
+                  streetNumber
+                  complement
+                  neighborhood
+                  postalCode
+                  city
+                  state
+                }
               }
             }`,
         { id },

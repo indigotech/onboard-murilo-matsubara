@@ -5,10 +5,8 @@ import { User } from '../entities/user.entity';
 import { CustomValidationError } from '../exceptions/custom-validation-error';
 import { InvalidLoginCredentials } from '../exceptions/invalid-login-credentials';
 import { InvalidPassword } from '../exceptions/invalid-password';
-import { Queries } from '../queries/queries';
 import { signJwt, validateJwt } from '../utils/auth';
 import { GraphqlContext } from '../utils/context';
-import { toDateString } from '../utils/date';
 import { Env } from '../utils/env';
 import { checkPassword, hashPassword, isPasswordValid, rulesErrorMessage } from '../utils/password';
 
@@ -78,7 +76,7 @@ export const userResolver = {
     user: async (_: never, { id }: { id: number }, { jwt }: GraphqlContext) => {
       validateJwt(jwt);
 
-      const user = await dataSource.manager.findOne(User, { where: { id } });
+      const user = await dataSource.manager.findOne(User, { where: { id }, relations: { addresses: true } });
       if (!user) {
         throw new CustomValidationError(
           'User not found',
@@ -144,19 +142,27 @@ async function paginatedUsers(options: UsersQueryOptions) {
 }
 
 async function fetchPaginatedUsers(options: UsersQueryOptions): Promise<User[]> {
-  let users: User[];
+  const queryBuilder = dataSource
+    .getRepository(User)
+    .createQueryBuilder('user')
+    .leftJoinAndSelect('user.addresses', 'address')
+    .orderBy({
+      'user.name': 'ASC',
+      'user.id': 'ASC',
+    })
+    .take(options.pageSize)
+    .skip(options.skip);
+
   if (options.pageFirstUserId !== undefined) {
-    users = await dataSource.query(Queries.paginatedUsersFilterId, [
-      options.pageSize,
-      options.skip,
-      options.pageFirstUserId,
-    ]);
-  } else {
-    users = await dataSource.query(Queries.paginatedUsers, [options.pageSize, options.skip]);
+    queryBuilder.where(
+      `(user.name, user.id) >= (
+        select name, id
+        from public.user
+        where id = :id
+      )`,
+      { id: options.pageFirstUserId },
+    );
   }
 
-  for (const user of users) {
-    user.birthDate = toDateString(user.birthDate as unknown as Date);
-  }
-  return users;
+  return queryBuilder.getMany();
 }

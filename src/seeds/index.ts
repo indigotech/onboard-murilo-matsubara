@@ -1,6 +1,6 @@
 import { config as makeDotenvAvailable } from 'dotenv';
 import { dataSource, setupDataSource } from '../data-source';
-import { seedUsers } from './users';
+import { seedUsersWithAddresses } from './users';
 
 async function seed() {
   makeDotenvAvailable();
@@ -8,7 +8,7 @@ async function seed() {
   await setupDataSource(dataSource);
 
   console.log('Seeding users...');
-  await seedUsers(50, dataSource);
+  await seedUsersWithAddresses(50, dataSource, 1);
   console.log('Seeding completed!');
 }
 
